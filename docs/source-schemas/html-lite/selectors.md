@@ -56,6 +56,9 @@ Use XPath when:
 XPath examples:
 - xpath=.//time[@datetime]
 - xpath=.//img[1]
+- xpath=.//h2[@class='event-title']/a
+
+XPath selectors with attribute predicates (for example `[@class='...']`) are supported.
 
 Use CSS-like selectors when:
 - matching simple class/id/tag structures

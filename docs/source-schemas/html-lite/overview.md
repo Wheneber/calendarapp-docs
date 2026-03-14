@@ -9,7 +9,7 @@ Use HtmlLite when onboarding a new source that serves static HTML containing eve
 - Text extraction: `selector`
 - Attribute extraction: `selector@attribute` or `selector::attr(attribute)`
 - Constant value: `literal:...`
-- Selector language: limited CSS-like selectors plus `xpath=` when needed
+- Selector language: limited CSS-like selectors plus `xpath=`
 - `detailPage.linkSelector` must resolve to a URL
 - `detailPage.detailMappings` run against detail-page DOM
 - `pagination.type` allowed values: `nextLink`, `queryIncrement`, `pathIncrement`, `fixedUrls`
@@ -32,7 +32,7 @@ If list-page time is unreliable, use a temporary parseable `literal:` start time
 
 1. Confirm source compatibility with static HTML parsing.
 2. Build a minimal schema.
-3. Add identity, pagination, and detail-page rules as needed.
+3. Add identity, pagination, and detail-page rules.
 4. Submit Draft and review backend validation result.
 5. Handoff schema ID and validation notes for admin review.
 

@@ -156,4 +156,4 @@ Use this pattern for Drupal list pages where real time precision is on detail pa
 }
 ```
 
-This is intentionally a bootstrap schema. After validation succeeds, tune `maxPages` and improve time precision as needed.
+This schema is a validated bootstrap pattern for non-zero event parsing on the Multnomah source.
