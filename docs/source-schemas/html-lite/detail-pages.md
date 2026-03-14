@@ -14,6 +14,8 @@ Use detail-page enrichment when list pages provide incomplete data.
 - detailPage.linkSelector
 - detailPage.detailMappings
 
+`detailMappings` supports the same keys as `mappings`: `title`, `description`, `location`, `venueName`, `venueAddress`, `url`, `imageUrl`, `endTime`, `recurrenceRule`. Detail values override list-page values when non-empty.
+
 ## Example
 
 ```json
@@ -24,7 +26,8 @@ Use detail-page enrichment when list pages provide incomplete data.
     "detailMappings": {
       "description": ".event-full-description",
       "imageUrl": "img.hero::attr(src)",
-      "venueAddress": ".venue-address"
+      "venueAddress": ".venue-address",
+      "recurrenceRule": ".recurrence-info::attr(data-rrule)"
     }
   }
 }
