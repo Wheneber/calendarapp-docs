@@ -69,6 +69,11 @@ Decision order:
 4. fixedUrls
 5. single page with pagination risk note
 
+Pagination contract:
+- Use `pagination.type` (not `pagination.mode`).
+- Allowed values: `nextLink`, `queryIncrement`, `pathIncrement`, `fixedUrls`.
+- `query` is invalid. For query-based paging, use `queryIncrement` with `parameter`, `start`, and `step`.
+
 ## Step 5: Add Detail Enrichment If Needed
 
 Enable detailPage when list pages are insufficient.

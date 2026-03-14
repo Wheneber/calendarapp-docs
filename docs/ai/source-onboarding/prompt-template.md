@@ -48,6 +48,9 @@ Schema contract (must follow exactly):
 - For attribute extraction: use "selector@attribute".
 - Do not output mapping objects like {"selector":"...","type":"...","attribute":"..."}.
 - If detail page extraction is used, use detailPage.linkSelector and detailPage.detailMappings with string selectors only.
+- Pagination uses `pagination.type` (not `pagination.mode`).
+- Allowed pagination.type values: "nextLink", "queryIncrement", "pathIncrement", "fixedUrls".
+- Do not use "query" as a pagination type. Use "queryIncrement" with parameter/start/step.
 
 Output exactly two things and nothing else:
 
