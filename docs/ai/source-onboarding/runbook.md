@@ -48,6 +48,14 @@ Minimum:
 - mappings.startTime
 - validation.requiredFields = ["title", "startTime"]
 
+Bootstrap strategy:
+
+1. Start with minimal schema and validate quickly.
+2. If zero events, simplify `eventCardSelector` to the most stable repeated title wrapper.
+3. If list-page time is not reliably parseable, use temporary `literal:` startTime.
+4. Move real time extraction to detail mappings using `startDate` + `startTime`.
+5. Only then add pagination breadth and richer fields.
+
 Mapping DSL rule:
 - mappings values must be strings only.
 - HtmlLite supports simple CSS-like selectors and XPath.
@@ -58,6 +66,12 @@ Mapping DSL rule:
 - do not use unsupported CSS operators directly; rewrite those selectors as XPath instead
 - if the page splits date and time, map `startDate` and `startTime`; `startTime` may be a time-only value or a visible range
 - do not emit object-style mappings with selector/type/attribute keys
+
+Detail-page rule:
+
+- when list fields are incomplete, set `detailPage.enabled = true`
+- ensure `detailPage.linkSelector` resolves to a URL from list-card scope
+- run `detailMappings` against detail DOM and let these override list values
 
 Identity requirement:
 1. explicit ID attribute
@@ -88,6 +102,14 @@ Enable detailPage when list pages are insufficient.
 1. POST /api/source-schemas
 2. Read response.validation
 3. If validation.isSuccess is false, adjust selectors/pagination and resubmit
+
+Adjustment priority when validation.totalEventsParsed = 0:
+
+1. simplify eventCardSelector
+2. verify required field mappings (`title`, `startTime`)
+3. use `literal:` startTime for bootstrap if needed
+4. verify linkSelector and detail mappings
+5. add pagination only after non-zero parse is achieved
 
 Max attempts:
 - 8 schema refinement submissions

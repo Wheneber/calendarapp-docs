@@ -41,6 +41,28 @@
 }
 ```
 
+## Minimal Progression (Recommended)
+
+Start small and validate each step.
+
+Step 1:
+
+```json
+{
+  "eventCardSelector": "h2.event__title",
+  "mappings": {
+    "title": "a",
+    "url": "a@href",
+    "startTime": "literal:2026-01-01T00:00:00-08:00"
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime", "url"]
+  }
+}
+```
+
+Step 2: add `id`, pagination, and detail-page mappings after Step 1 returns non-zero events.
+
 ## Full Example
 
 ```json
@@ -94,3 +116,44 @@ Use helper date mappings when the page exposes date and time in separate element
 ```
 
 In this mode, HtmlLite combines `startDate` with `startTime`. If `startTime` contains a visible range such as `10:30 AM - 11:30 AM`, the parser uses the first time for `StartTime` and the second time for `EndTime`.
+
+## Known-Good Bootstrap Pattern (Multnomah Example)
+
+Use this pattern for Drupal list pages where real time precision is on detail pages:
+
+```json
+{
+  "eventCardSelector": "h2.event__title",
+  "mappings": {
+    "id": "a@href",
+    "title": "a",
+    "url": "a@href",
+    "startTime": "literal:2026-01-01T00:00:00-08:00"
+  },
+  "detailPage": {
+    "enabled": true,
+    "linkSelector": "a@href",
+    "detailMappings": {
+      "title": "h1",
+      "url": "link[rel='canonical']@href",
+      "startDate": ".event__date",
+      "startTime": ".event__time",
+      "location": ".event__location",
+      "description": ".event__body",
+      "imageUrl": ".field--name-field-event-image img@src"
+    }
+  },
+  "pagination": {
+    "type": "queryIncrement",
+    "parameter": "page",
+    "start": 0,
+    "step": 1,
+    "maxPages": 3
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime", "url"]
+  }
+}
+```
+
+This is intentionally a bootstrap schema. After validation succeeds, tune `maxPages` and improve time precision as needed.

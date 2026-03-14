@@ -38,9 +38,11 @@ Inputs:
 Instructions:
 1. Browse <FEED_URL> and identify: event card selector, field mappings
    (title, startTime, endTime, location, url, id), and pagination mode.
-2. Construct the schemaDefinition JSON object with eventCardSelector,
-   mappings, pagination (if needed), and validation.requiredFields.
-3. Serialize schemaDefinition as a compact JSON string (no line breaks).
+2. Build schema in phases:
+   - Phase A (bootstrap): `eventCardSelector` + minimal mappings (`title`, `url`, parseable `startTime`) + validation.requiredFields.
+   - Phase B: add `id`, pagination, and detailPage mappings.
+3. If list-page time is unreliable, use `literal:` for bootstrap `startTime` and extract real `startDate` + `startTime` from detail pages.
+4. Construct the final schemaDefinition JSON object and serialize as a compact JSON string (no line breaks).
 
 Schema contract (must follow exactly):
 - mappings values must be strings, not objects.
@@ -53,6 +55,8 @@ Schema contract (must follow exactly):
 - Do not use unsupported CSS operators such as `>` or `.a, .b` unless you rewrite that selector as `xpath=`.
 - If the page splits date and time into separate nodes, map `startDate` and `startTime`. `startTime` may be a time-only value or a visible range like `10:30 AM - 11:30 AM`.
 - If detail page extraction is used, use detailPage.linkSelector and detailPage.detailMappings with string selectors only.
+- `detailPage.enabled` must be explicitly set to true when detail enrichment is required.
+- `detailPage.linkSelector` must resolve to a URL from the list-card scope.
 - Pagination uses `pagination.type` (not `pagination.mode`).
 - Allowed pagination.type values: "nextLink", "queryIncrement", "pathIncrement", "fixedUrls".
 - Do not use "query" as a pagination type. Use "queryIncrement" with parameter/start/step.
@@ -73,6 +77,12 @@ After the Invoke-RestMethod call, the script must also print the validation resu
 - "$($resp.validation.isSuccess)" — true or false
 - "$($resp.validation.totalEventsParsed) events parsed"
 - If validation.isSuccess is false: "$($resp.validation.errorMessage)"
+
+Before finalizing output, self-check:
+- all mappings are strings
+- selectors avoid unsupported CSS operators unless rewritten with `xpath=`
+- requiredFields align with mapped fields
+- linkSelector returns a URL
 ```
 
 ---

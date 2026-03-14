@@ -31,6 +31,18 @@ Examples:
 - a::attr(href)
 - img@src
 
+## Selector Scope Rules
+
+- `eventCardSelector` runs against the listing page document.
+- `mappings` selectors run relative to each matched event card node.
+- `detailPage.linkSelector` runs relative to the matched event card node.
+- `detailPage.detailMappings` selectors run against the fetched detail page document.
+
+Scope example:
+
+- If `eventCardSelector` is `h2.event__title` then mapping `title: "a"` selects the anchor inside that `<h2>`.
+- In `detailMappings`, `title: "h1"` selects from the detail page root, not the list page card.
+
 ## CSS-like vs XPath
 
 HtmlLite is not XPath-only. It supports a limited CSS-like subset and raw XPath.
