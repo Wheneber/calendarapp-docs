@@ -35,5 +35,5 @@ This site is organized for two audiences:
 
 | Page | Description |
 |---|---|
-| [Autonomous Runbook](ai/source-onboarding/runbook.md) | Step-by-step workflow for AI agents submitting sources |
-| [Prompt Template](ai/source-onboarding/prompt-template.md) | Reusable prompt for sourcing and submitting via the API |
+| [Autonomous Runbook](ai/source-onboarding/runbook.md) | Step-by-step workflow for AI agents with HTTP tool use |
+| [ChatGPT Prompt](ai/source-onboarding/prompt-template.md) | Prompt for ChatGPT to generate a schema and ready-to-run submission command |

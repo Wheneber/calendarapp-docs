@@ -39,4 +39,4 @@ nav:
   - AI Guides:
       - Source Onboarding:
           - Autonomous Runbook: ai/source-onboarding/runbook.md
-          - Prompt Template: ai/source-onboarding/prompt-template.md
+          - ChatGPT Prompt: ai/source-onboarding/prompt-template.md

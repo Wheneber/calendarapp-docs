@@ -1,87 +1,67 @@
-# Autonomous Prompt Template
+# ChatGPT Schema Generation Prompt
 
-Use this prompt with autonomous agents:
+Use this prompt with **standard ChatGPT or any plain chat interface** to generate a schema and a ready-to-run submission command.
+
+> If you are using an AI agent with HTTP tool use (custom GPT with API Actions, etc.), use the [Autonomous Runbook](runbook.md) instead.
 
 ---
 
-Add one new HTML event source to HtmlLite SourceSchema end-to-end without human interaction.
+## How it works
+
+ChatGPT cannot call APIs on your behalf. Instead, this prompt instructs it to:
+
+1. Browse the feed URL and inspect the HTML structure
+2. Build the complete `schemaDefinition`
+3. Output a copy-pasteable PowerShell command you run yourself to submit it
+
+---
+
+## Prompt
+
+Copy the block below, fill in the inputs, and paste it into ChatGPT.
+
+Before answering, read the docs under [HtmlLite](../../source-schemas/html-lite).
+
+---
+
+```
+Build a complete HtmlLite SourceSchema submission for the following source.
 
 Inputs:
 - sourceName: <SOURCE_NAME>
 - feedUrl: <FEED_URL>
-- expectedLocation: <LOCATION>
-- expectedCategory: <CATEGORY>
-- expectedRegion: <REGION>
-- expectedLanguage: <LANGUAGE>
+- expectedLocation: <LOCATION> (optional — infer from site if omitted)
+- expectedCategory: <CATEGORY> (optional — infer from site if omitted)
+- expectedRegion: <REGION> (optional — infer from site if omitted)
+- expectedLanguage: <LANGUAGE> (optional — default "en" if omitted)
 
-Before starting, read the following reference pages in order:
+Instructions:
+1. Browse <FEED_URL> and identify: event card selector, field mappings
+   (title, startTime, endTime, location, url, id), and pagination mode.
+2. Construct the schemaDefinition JSON object with eventCardSelector,
+   mappings, pagination (if needed), and validation.requiredFields.
+3. Serialize schemaDefinition as a compact JSON string (no line breaks).
 
-1. [API Workflow](../../source-schemas/html-lite/api-workflow.md) — POST endpoint, request body fields, response shape, and how to interpret `validation.*`
-2. [Schema Basics](../../source-schemas/html-lite/schema-basics.md) — `schemaDefinition` structure: `eventCardSelector`, `mappings`, `validation`
-3. [Selectors](../../source-schemas/html-lite/selectors.md) — CSS selector and XPath syntax for extracting field values
-4. [Pagination](../../source-schemas/html-lite/pagination.md) — `nextLink`, `queryIncrement`, `pathIncrement`, and `fixedUrls` modes and their schema fields
-5. [Detail Pages](../../source-schemas/html-lite/detail-pages.md) — when and how to enable `detailPage` enrichment
-6. [Troubleshooting](../../source-schemas/html-lite/troubleshooting.md) — how to diagnose and fix validation failures before retrying
+Output exactly two things and nothing else:
 
-Use this link if you need additional information to navigate to other docs: [Home](../../index.md)
+### 1. schemaDefinition JSON (pretty-printed for review)
+<paste the full schemaDefinition object here, formatted for readability>
 
-Constraints:
-- use only SourceSchemas endpoints
-- schemaDefinition must be submitted as a JSON string
-- prefer machine-readable datetime fields
-- use stable external IDs; never use title text alone for ID
-- automatically choose pagination mode: nextLink, queryIncrement, pathIncrement, or fixedUrls
-- enable detail page enrichment only when needed
-- retry with selector and pagination adjustments when submit validation fails
-- do not stop for user confirmation
-- do not call admin-only approve or trigger endpoints
-
-Required workflow:
-1. viability detection
-2. schema construction
-3. pagination strategy selection
-4. submit draft and evaluate response.validation
-5. retry on validation failure
-6. produce admin handoff packet
-7. final structured report
-
-Success criteria:
-- response.validation.isSuccess = true
-- draft submission isSuccess = true
-- response.validation.totalEventsParsed is non-zero
-
-Return only:
-- final structured report
-- final schemaDefinition JSON used in submission
-
-Example success report:
-
-```json
-{
-	"sourceName": "Example Events",
-	"feedUrl": "https://www.example.org/events",
-	"schemaId": "1acba9be-d70c-435a-8efb-123e350638e5",
-	"status": "Success",
-	"validationTotalEventsParsed": 12,
-	"validationIsSuccess": true,
-	"handoffReady": true,
-	"blockers": [],
-	"nextActions": ["Send to admin review"]
-}
+### 2. Ready-to-run PowerShell submission command
+Produce a complete PowerShell Invoke-RestMethod command targeting
+http://localhost:5047/api/source-schemas that submits all fields
+(name, description, type, feedUrl, schemaDefinition, metadata).
+schemaDefinition must be the compact single-line JSON string.
+The command must be copy-pasteable with no placeholders remaining.
 ```
 
-Example failure report:
+---
 
-```json
-{
-	"sourceName": "Example Events",
-	"feedUrl": "https://www.example.org/events",
-	"schemaId": "7d88c4a3-c9d4-4c4d-beb1-b9d71e590fa3",
-	"status": "Failed",
-	"validationTotalEventsParsed": 0,
-	"validationIsSuccess": false,
-	"handoffReady": false,
-	"blockers": ["validation.errorMessage: Invalid schema definition"],
-	"nextActions": ["Fix schema and resubmit"]
-}
-```
+## After running the command
+
+The response will include a `validation` object. Check:
+
+- `validation.isSuccess = true` and `validation.totalEventsParsed > 0` → ready for admin handoff
+- `validation.isSuccess = false` → copy `validation.errorMessage` back into ChatGPT and ask it to fix the schema, then resubmit
+
+

@@ -2,6 +2,8 @@
 
 Use this runbook for autonomous agents onboarding a new HtmlLite source with no human interaction.
 
+---
+
 ## Execution Rules
 
 - do not pause for manual review requests mid-run
@@ -9,17 +11,21 @@ Use this runbook for autonomous agents onboarding a new HtmlLite source with no 
 - stop only on terminal failure conditions
 - emit a final machine-readable summary
 
+## Before answering, read the following pages:
+
+Read the docs under [HtmlLite](../../source-schemas/html-lite).
+
 ## Step 1: Gather Inputs
 
 Required:
 - sourceName
 - feedUrl
+
+Optional:
 - expectedLocation
 - expectedCategory
 - expectedRegion
 - expectedLanguage
-
-Optional:
 - knownEventCardSelector
 - knownTimeSelector
 - knownNextLinkSelector
