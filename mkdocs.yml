@@ -1,0 +1,42 @@
+site_name: CalendarApp Docs
+site_description: Public documentation for CalendarApp source contribution workflows for humans and AI agents.
+site_url: https://github.com/calendarapp/calendarapp-docs
+repo_url: https://github.com/calendarapp/calendarapp-docs
+repo_name: calendarapp/calendarapp-docs
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - tables
+  - attr_list
+  - def_list
+
+nav:
+  - Home: index.md
+  - User Guides:
+      - HtmlLite Source Submission:
+          - Overview: source-schemas/html-lite/overview.md
+          - API Workflow: source-schemas/html-lite/api-workflow.md
+          - Schema Basics: source-schemas/html-lite/schema-basics.md
+          - Selectors: source-schemas/html-lite/selectors.md
+          - Event Identity: source-schemas/html-lite/event-identity.md
+          - Time Handling: source-schemas/html-lite/time-handling.md
+          - Pagination: source-schemas/html-lite/pagination.md
+          - Detail Pages: source-schemas/html-lite/detail-pages.md
+          - Validation Checklist: source-schemas/html-lite/validation-checklist.md
+          - Troubleshooting: source-schemas/html-lite/troubleshooting.md
+  - AI Guides:
+      - Source Onboarding:
+          - Autonomous Runbook: ai/source-onboarding/runbook.md
+          - Prompt Template: ai/source-onboarding/prompt-template.md

@@ -1,0 +1,139 @@
+# HtmlLite API Workflow
+
+## Step 1: Submit Draft (With Built-in Validation)
+
+Call:
+- POST /api/source-schemas
+
+Include:
+- name
+- description
+- type = HtmlLite
+- feedUrl
+- schemaDefinition as JSON string
+- metadata (location, category, region, language, estimatedEventCount)
+
+Response includes:
+- sourceSchema
+- validation.isSuccess
+- validation.totalEventsParsed
+- validation.sampleEvents
+- validation.errorMessage
+
+## Response Examples
+
+Success example:
+
+```json
+{
+  "sourceSchema": {
+    "id": "1acba9be-d70c-435a-8efb-123e350638e5",
+    "name": "Example Events - HtmlLite",
+    "type": "HtmlLite",
+    "feedUrl": "https://www.example.org/events",
+    "status": "Draft"
+  },
+  "validation": {
+    "isSuccess": true,
+    "totalEventsParsed": 12,
+    "sampleEvents": [
+      {
+        "title": "Community Yoga",
+        "startTime": "2026-04-20T18:00:00-07:00",
+        "endTime": "2026-04-20T19:00:00-07:00",
+        "location": "Riverfront Center",
+        "eventUrl": "https://www.example.org/events/yoga"
+      }
+    ],
+    "errorMessage": null
+  }
+}
+```
+
+Failure example:
+
+```json
+{
+  "sourceSchema": {
+    "id": "7d88c4a3-c9d4-4c4d-beb1-b9d71e590fa3",
+    "name": "Example Events - HtmlLite",
+    "type": "HtmlLite",
+    "feedUrl": "https://www.example.org/events",
+    "status": "Draft"
+  },
+  "validation": {
+    "isSuccess": false,
+    "totalEventsParsed": 0,
+    "sampleEvents": [],
+    "errorMessage": "No parser registered for schema type HtmlLite"
+  }
+}
+```
+
+## Step 2: Review Validation Result
+
+Validation pass:
+- validation.isSuccess = true
+- validation.totalEventsParsed is non-zero and reasonable
+
+Validation failure:
+- validation.isSuccess = false
+- review validation.errorMessage
+- fix schema and submit a new Draft version
+
+## Step 3: Handoff To Admin Review
+
+After Draft submission, hand off schema ID and validation notes to admins.
+
+Community and external AI contributors should not call admin-only approval or trigger endpoints.
+
+## PowerShell Example
+
+```powershell
+$base = 'http://localhost:5047/api/source-schemas'
+
+$schemaObject = @{
+  eventCardSelector = 'div.event-teaser'
+  mappings = @{
+    id = 'a::attr(href)'
+    title = 'h3'
+    startTime = 'xpath=.//time[@datetime]::attr(datetime)'
+    url = 'a::attr(href)'
+  }
+  validation = @{
+    requiredFields = @('title','startTime')
+  }
+}
+
+$schemaDefinition = $schemaObject | ConvertTo-Json -Depth 20 -Compress
+
+$submitBody = @{
+  name = 'Example Events - HtmlLite'
+  description = 'Community-submitted HtmlLite source'
+  type = 'HtmlLite'
+  feedUrl = 'https://www.example.org/events'
+  schemaDefinition = $schemaDefinition
+  metadata = @{
+    location = 'Example City'
+    category = 'community'
+    region = 'Example Region'
+    language = 'en'
+    estimatedEventCount = 10
+  }
+} | ConvertTo-Json -Depth 12
+
+$created = Invoke-RestMethod -Uri $base -Method Post -ContentType 'application/json' -Body $submitBody
+$created | ConvertTo-Json -Depth 8
+
+# Save schema ID for admin handoff
+$id = $created.sourceSchema.id
+"Submitted Draft SourceSchema ID: $id"
+
+# Validation result from submit response
+$validation = $created.validation
+"Validation success: $($validation.isSuccess)"
+"Parsed events: $($validation.totalEventsParsed)"
+if (-not $validation.isSuccess) {
+  "Validation error: $($validation.errorMessage)"
+}
+```
