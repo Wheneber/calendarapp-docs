@@ -58,6 +58,7 @@ Schema contract (must follow exactly):
 - For `HtmlLite`, prefer simple CSS-like selectors for tag/class/id and descendant-by-space patterns such as `h2 a`.
 - For `HtmlLite`, use `xpath=` when you need unsupported CSS features like `>`, comma-separated selector lists, sibling logic, or positional filters.
 - For `HtmlLite`, attribute extraction uses `selector@attribute` or `selector::attr(attribute)`.
+- For `HtmlLite`, do not use `regex:` mapping strings; they are unsupported.
 - For `HtmlLite`, if detail page extraction is used, use detailPage.linkSelector and detailPage.detailMappings with string selectors only.
 - For `HtmlLite`, allowed pagination.type values are `nextLink`, `queryIncrement`, `pathIncrement`, `fixedUrls`.
 - Do not include unsupported fields such as `sourceName`, `baseUrl`, or `transforms` inside `schemaDefinition`.

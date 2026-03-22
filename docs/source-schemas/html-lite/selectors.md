@@ -79,6 +79,16 @@ Avoid unsupported CSS syntax in HtmlLite:
 
 If you need any of those, switch that selector to `xpath=` instead of trying to force full CSS syntax.
 
+Unsupported mapping syntax:
+
+- `regex:(...)` is not a supported selector or mapping DSL in HtmlLite
+
+If a date/time value needs normalization beyond selector extraction:
+
+1. prefer extracting machine-readable attributes first (for example `time::attr(datetime)`)
+2. use `startDate` plus `startTime` when the page splits date/time
+3. if the source requires heavy transformation, consider `JsonApi` instead of HtmlLite
+
 ## Invalid vs Valid Examples
 
 Chat models often try to hedge with multiple fallback selectors in a single string. That does not work in HtmlLite.

@@ -239,6 +239,22 @@ Why invalid:
 - `baseUrl` and `transforms` are not part of the HtmlLite contract.
 - `url` and `imageUrl` are already resolved to absolute URLs downstream when valid relative links are captured.
 
+### Invalid: unsupported `regex:` mapping syntax
+
+```json
+{
+  "mappings": {
+    "startTime": "regex:(\\w+ \\d{1,2}, \\d{4})"
+  }
+}
+```
+
+Why invalid:
+- HtmlLite mappings expect supported selector strings, XPath selectors, attribute extraction syntax, or `literal:` values.
+- `regex:` is not part of the HtmlLite mapping DSL.
+
+Use selector-based extraction instead (for example `time::attr(datetime)` or split `startDate` and `startTime`).
+
 ### Invalid: wrong field name
 
 ```json
