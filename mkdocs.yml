@@ -28,22 +28,28 @@ nav:
     - Scope And Audience: index.md
     - Choose A Source Type: source-schemas/choose-source-type.md
     - Submission API And Validation: source-schemas/submission-api-and-validation.md
+    - Source Schema JSON Schema Files: source-schemas/json-schema-files.md
     - Human Workflow (Source Contributor): source-schemas/choose-source-type.md
     - AI Workflow (Autonomous Agent): ai/source-onboarding/runbook.md
   - Human Source Contribution:
     - Shared Workflow:
       - Choose A Source Type: source-schemas/choose-source-type.md
       - Submission API And Validation: source-schemas/submission-api-and-validation.md
+      - Source Schema JSON Schema Files: source-schemas/json-schema-files.md
       - Validation Checklist: source-schemas/html-lite/validation-checklist.md
       - Troubleshooting: source-schemas/html-lite/troubleshooting.md
     - Ics Reference:
       - Overview: source-schemas/ics.md
+      - Ics JSON Schema: source-schemas/ics.schema.json
     - Rss Reference:
       - Overview: source-schemas/rss.md
+      - Rss JSON Schema: source-schemas/rss.schema.json
     - JsonApi Reference:
       - Overview: source-schemas/json-api.md
+      - JsonApi V2 JSON Schema: source-schemas/json-api-v2-json-schema.md
     - HtmlLite Reference:
       - Overview: source-schemas/html-lite/overview.md
+      - HtmlLite JSON Schema: source-schemas/html-lite.schema.json
       - API Workflow: source-schemas/html-lite/api-workflow.md
       - Schema Basics: source-schemas/html-lite/schema-basics.md
       - Selectors: source-schemas/html-lite/selectors.md

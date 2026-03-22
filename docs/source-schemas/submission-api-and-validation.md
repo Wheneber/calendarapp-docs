@@ -102,6 +102,7 @@ The backend enforces these common rules for every source type:
 
 `JsonApi` has extra schema-contract validation:
 
+- new JsonApi sources should default to `schemaVersion = 2`
 - `schemaVersion` must be `1` or `2` when provided
 - advanced features require `schemaVersion = 2`
 - `validationProfile = Advanced` requires `schemaVersion = 2`
@@ -140,10 +141,42 @@ The backend enforces these common rules for every source type:
 
 ```json
 {
+  "schemaVersion": 2,
   "eventArrayPath": "$.events[*]",
   "mappings": {
     "title": "$.title",
     "startTime": "$.start"
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime"]
+  }
+}
+```
+
+When the source splits date/time fields or exposes source timezone, a practical v2 shape often looks more like this:
+
+```json
+{
+  "schemaVersion": 2,
+  "eventArrayPath": "$.events[*]",
+  "mappings": {
+    "title": "$.title",
+    "startTime": "$.startTime",
+    "endTime": "$.endTime",
+    "timeZone": "$.timeZone"
+  },
+  "responseTransforms": {
+    "flattenPath": "$.events[*]",
+    "fields": {
+      "startTime": {
+        "type": "Composite",
+        "template": "{{startDate}} {{startClock}}",
+        "inputs": {
+          "startDate": "$.start.date",
+          "startClock": "$.start.time"
+        }
+      }
+    }
   },
   "validation": {
     "requiredFields": ["title", "startTime"]
@@ -308,11 +341,30 @@ When `validation.isSuccess = true` but `totalEventsParsed = 0` (or implausibly l
 
 1. `feedUrl` returns the expected JSON payload at request time.
 2. `eventArrayPath` points to repeated event items, not wrapper/config nodes.
-3. Mapping paths are relative to each event item.
-4. Required headers are present (for example, browser-like `User-Agent` when needed).
-5. Pagination/workflow settings are not limiting extraction unexpectedly.
+3. If `responseTransforms` are used, `responseTransforms.flattenPath` points to the intended repeated event nodes.
+4. Mapping paths are relative to each event item.
+5. Required fields remain populated after mappings/transforms; zero parsed events can mean every candidate event was filtered out because `title` or `startTime` ended up empty.
+6. If the source provides timezone, `timeZone` is mapped from source rather than assumed from runtime environment.
+7. Required headers are present (for example, browser-like `User-Agent` when needed).
+8. Pagination/workflow settings are not limiting extraction unexpectedly.
 
 If a payload clearly contains events but extraction is empty, simplify `eventArrayPath` and mappings until one sample event parses, then build back up.
+
+## Formal Schema Definition Status
+
+CalendarApp now publishes contributor-facing JSON Schema documents for all supported `schemaDefinition` types.
+
+See [Source Schema JSON Schema Files](json-schema-files.md).
+
+Use these as the source of truth instead:
+
+- the contributor-facing JsonApi v2 JSON Schema file for machine-readable authoring help
+- the contributor-facing source-schema JSON Schema files for machine-readable authoring help
+- the type-specific documentation on this site
+- backend contract validation and error messages
+- the backend source models and tests for supported fields and combinations
+
+That means contributors and AI should treat the JSON Schema plus docs as authoring guidance, while backend validation remains the authoritative final contract.
 
 ## Contributor Handoff Checklist
 

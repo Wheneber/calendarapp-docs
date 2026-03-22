@@ -2,6 +2,8 @@
 
 Use `Ics` when the source publishes a valid iCalendar feed. This is usually the best option when available because the parser reads standard calendar fields directly.
 
+For a machine-readable authoring contract, use the contributor-facing [Ics JSON Schema](ics.schema.json).
+
 ## When To Use It
 
 Use `Ics` when:

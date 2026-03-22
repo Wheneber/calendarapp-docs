@@ -2,6 +2,8 @@
 
 Use `Rss` when the source publishes RSS or Atom and each item behaves like an event record.
 
+For a machine-readable authoring contract, use the contributor-facing [Rss JSON Schema](rss.schema.json).
+
 ## When To Use It
 
 Use `Rss` when:

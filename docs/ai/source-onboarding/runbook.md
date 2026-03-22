@@ -81,14 +81,17 @@ Terminal failure:
 Structured-source bootstrap rules:
 - `Ics`: use a minimal validation-only schemaDefinition unless the source needs stricter required fields
 - `Rss`: define `extractionRules` and map at least `title` and parseable `startTime`
-- `JsonApi`: define `eventArrayPath` plus `mappings`, then add pagination or auth only if needed
+- `JsonApi`: start new sources at `schemaVersion = 2`, define `eventArrayPath` plus `mappings`, then add pagination or auth only if needed
 
 JsonApi bootstrap guardrails:
 
-1. Start with minimal mappings (`title`, `startTime`) and requiredFields aligned to those mappings.
-2. Validate event path first, then expand field coverage.
-3. If zero events parse, adjust one variable at a time (path, mapping scope, headers, pagination).
-4. Capture parser-compatibility notes when a path syntax assumption fails.
+1. Start with `schemaVersion = 2` for new sources.
+2. Start with minimal mappings (`title`, `startTime`) and requiredFields aligned to those mappings.
+3. Validate event path first, then expand field coverage.
+4. If the source splits date and time across fields, use `responseTransforms` to compose parser-ready `startTime` and `endTime` values.
+5. If the source provides timezone, map `timeZone` from source data.
+6. If zero events parse, adjust one variable at a time (path, mapping scope, transform shape, headers, pagination).
+7. Capture parser-compatibility notes when a path syntax assumption fails.
 
 HtmlLite bootstrap rules remain below.
 
@@ -125,6 +128,7 @@ For every type:
 - never call admin approval endpoints
 
 For `JsonApi`:
+- new sources should default to `schemaVersion = 2`
 - `schemaVersion` must be `1` or `2` when provided
 - advanced features require `schemaVersion = 2`
 - `requestWorkflow` and `pagination` cannot both be configured
@@ -184,11 +188,15 @@ For every iteration, record:
 Do not batch multiple schema changes in a single retry unless blocked by request-shape validity.
 
 When `validation.totalEventsParsed = 0`, retry in this order:
-1. simplify `eventCardSelector`
+1. verify event path or `responseTransforms.flattenPath` matches repeated event nodes
 2. verify `title` and parseable `startTime`
-3. apply temporary `literal:` `startTime`
-4. verify detail link and detail mappings
+3. verify transformed `startTime` and `endTime` are actually populated after mappings/transforms
+4. map `timeZone` when the source provides it
 5. add or correct pagination
+
+For JsonApi specifically, remember that a zero-event result can mean either:
+- event path selection matched no event nodes
+- required fields were empty after mappings/transforms and every candidate event was filtered out
 
 Max refinement attempts:
 - 8 submissions

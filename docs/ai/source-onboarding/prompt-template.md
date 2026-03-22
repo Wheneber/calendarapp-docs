@@ -44,16 +44,20 @@ Instructions:
 4. Build the smallest valid schema for that type, then enrich it only if needed.
 5. Construct the final schemaDefinition JSON object and serialize as a compact JSON string (single line).
 6. Use only values that can be inferred from feed or page content. Do not invent fields not evidenced by the source.
-7. If JsonApi parsing returns zero events, debug in this order: eventArrayPath scope, mapping scope, required headers, then pagination/workflow.
+7. If JsonApi parsing returns zero events, debug in this order: eventArrayPath or flattenPath scope, mapping/transform scope, source timezone mapping when present, required headers, then pagination/workflow.
 8. Change one variable per retry and explain what changed.
 
 Schema contract (must follow exactly):
 - `schemaDefinition` must be valid JSON and will be sent as a compact JSON string.
 - For `Ics`, use a validation-only schema unless stricter checks are needed.
 - For `Rss`, use `extractionRules` and map at least `title` and `startTime`.
-- For `JsonApi`, include `eventArrayPath` and `mappings`; use `schemaVersion` 1 or 2 when needed.
+- For `JsonApi`, include `schemaVersion: 2` for new sources unless you are intentionally preserving a legacy v1 schema.
+- For `JsonApi`, include `eventArrayPath` and `mappings`.
 - For `JsonApi`, advanced features require `schemaVersion = 2`.
 - For `JsonApi`, do not configure both `requestWorkflow` and `pagination`.
+- For `JsonApi`, if date and time are split across fields, use `responseTransforms` to compose parser-ready `startTime` and `endTime` values.
+- For `JsonApi`, if the source provides timezone, map `timeZone` from the source.
+- For `JsonApi`, when transforms reshape the effective event payload, set `responseTransforms.flattenPath` explicitly.
 - If a usable event JSON endpoint exists, choose `JsonApi`, not `HtmlLite`.
 - For `HtmlLite`, mappings values must be strings, not objects.
 - For `HtmlLite`, do not use comma-separated selector lists. Rewrite them as `xpath=` if needed.
@@ -105,7 +109,9 @@ Before finalizing output, self-check:
 - a higher-priority source type was not incorrectly skipped
 - all required fields for that source type are present
 - event path points to repeated event records, not wrapper/config nodes
+- if `responseTransforms` are used, transformed required fields are populated and parseable
 - requiredFields are present in mapped output
+- if source timezone is available, `timeZone` is mapped
 - HtmlLite selectors avoid unsupported CSS operators unless rewritten with `xpath=`
 - HtmlLite selectors do not use commas
 - requiredFields align with mapped fields

@@ -4,6 +4,8 @@ Use `JsonApi` when event data comes from a JSON endpoint instead of ICS, RSS, or
 
 If a usable event JSON endpoint exists, `JsonApi` is the correct type even when the page visually renders event cards.
 
+For new JsonApi sources, default to `schemaVersion = 2`.
+
 ## When To Use It
 
 Use `JsonApi` when:
@@ -35,6 +37,22 @@ Do not use `JsonApi` when an equivalent ICS or RSS feed already provides the sam
 }
 ```
 
+For new sources, prefer this minimal v2 shape instead of omitting `schemaVersion`:
+
+```json
+{
+  "schemaVersion": 2,
+  "eventArrayPath": "$.events[*]",
+  "mappings": {
+    "title": "$.title",
+    "startTime": "$.start"
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime"]
+  }
+}
+```
+
 ## Optional Features
 
 Add these only when needed:
@@ -45,6 +63,14 @@ Add these only when needed:
 - `requestHeaders` for required headers such as `User-Agent`
 - `requestWorkflow` for multi-step request chains
 - `schemaVersion = 2` for advanced features such as tokens, query templates, response transforms, or windowed pagination
+
+## Default Version Guidance
+
+- New JsonApi sources should start at `schemaVersion = 2`.
+- Keep `schemaVersion = 1` only for legacy schemas that are already working and do not need v2-only features.
+- If the source needs `responseTransforms`, `flattenPath`, token acquisition, query templates, or windowed pagination, `schemaVersion = 2` is required.
+
+Use the contributor-facing [JsonApi V2 JSON Schema](json-api-v2-json-schema.md) when you want a machine-readable contract for authoring or AI validation.
 
 ## Requirements And Validation Notes
 
@@ -125,6 +151,55 @@ Example advanced shape:
 
 Use this kind of pattern when the source has an event API with token acquisition, query templates, or transformed response fields. Do not try to recreate the same source with HtmlLite selectors.
 
+## Split Date/Time And Source Timezone Pattern
+
+Use this pattern when the payload stores date and time in separate fields and also exposes timezone in the source data.
+
+```json
+{
+  "schemaVersion": 2,
+  "eventArrayPath": "$.data.widgets[*].data.settings.events[*]",
+  "mappings": {
+    "id": "$.id",
+    "title": "$.name",
+    "startTime": "$.startTime",
+    "endTime": "$.endTime",
+    "timeZone": "$.timeZone",
+    "url": "$.buttonLink.value"
+  },
+  "responseTransforms": {
+    "flattenPath": "$.data.widgets[*].data.settings.events[*]",
+    "fields": {
+      "startTime": {
+        "type": "Composite",
+        "template": "{{startDate}} {{startClock}}",
+        "inputs": {
+          "startDate": "$.start.date",
+          "startClock": "$.start.time"
+        }
+      },
+      "endTime": {
+        "type": "Composite",
+        "template": "{{endDate}} {{endClock}}",
+        "inputs": {
+          "endDate": "$.end.date",
+          "endClock": "$.end.time"
+        }
+      }
+    }
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime"]
+  }
+}
+```
+
+Guidance:
+
+- If the source provides timezone, map `timeZone` from the source instead of relying on runtime or server-local timezone assumptions.
+- When response transforms reshape or reframe the effective event payload, set `responseTransforms.flattenPath` explicitly.
+- If the source already provides explicit timezone offsets in `startTime` or `endTime`, preserve them.
+
 ## Recommended Contributor Workflow
 
 1. Find the JSON endpoint that returns real event objects.
@@ -154,9 +229,10 @@ Use this loop when `validation.totalEventsParsed` is `0` or unexpectedly low:
 1. Validate raw payload first and manually count a small sample of event items.
 2. Start with the shortest plausible `eventArrayPath` to the repeated event array.
 3. Test a minimal mapping set: only `title` and `startTime` required.
-4. If parsing fails, adjust only one variable per attempt (path scope, mapping path, or headers).
-5. Re-run `test-fetch` and inspect `sampleEvents` after each change.
-6. Add optional fields (`description`, venue fields, `imageUrl`) only after core parsing is stable.
+4. If `responseTransforms` are used, verify that transformed `startTime` and `endTime` values are actually populated and parseable.
+5. If parsing fails, adjust only one variable per attempt (path scope, mapping path, transform shape, or headers).
+6. Re-run `test-fetch` and inspect `sampleEvents` after each change.
+7. Add optional fields (`description`, venue fields, `imageUrl`) only after core parsing is stable.
 
 ## Mapping Reliability Checks
 
@@ -165,8 +241,9 @@ Before final submission, verify:
 1. `requiredFields` are actually mapped and consistently present.
 2. Mappings are scoped per event item, not at root or unrelated siblings.
 3. URL fields are valid or intentionally nullable when sources omit detail links.
-4. Date and time fields are complete enough for downstream use; if split across fields, note the limitation in handoff.
-5. `sampleEvents` include detail fields when the source provides them.
+4. Date and time fields are complete enough for downstream use; if split across fields, use `responseTransforms` to produce parser-ready datetime values.
+5. If the source provides timezone, map `timeZone` and verify sample events reflect the intended source timezone.
+6. `sampleEvents` include detail fields when the source provides them.
 
 ## Parser Compatibility Notes
 
@@ -180,6 +257,8 @@ Json path syntax support can vary by backend implementation. If a path looks val
 ## Common Failure Modes
 
 - wrong `eventArrayPath`
+- missing or incorrect `responseTransforms.flattenPath` when transforms reshape the effective event payload
+- transformed `startTime` or `endTime` values that remain empty or unparsable after composition
 - mappings that point to a scalar outside the current event item
 - unnecessary advanced features when a simpler schema would work
 - pagination configured together with requestWorkflow

@@ -2,6 +2,8 @@
 
 Use HtmlLite when onboarding a new source that serves static HTML containing event cards.
 
+For a machine-readable authoring contract, use the contributor-facing [HtmlLite JSON Schema](../html-lite.schema.json).
+
 If you are not sure the source should use HtmlLite, start with [Choose A Source Type](../choose-source-type.md) before building selectors.
 
 This reference is shared by both tracks:
