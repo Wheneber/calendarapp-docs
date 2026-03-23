@@ -73,8 +73,10 @@ Schema contract (must follow exactly):
 - For `HtmlLite`, attribute extraction uses `selector@attribute` or `selector::attr(attribute)`.
 - For `HtmlLite`, do not use `regex:` mapping strings; they are unsupported.
 - For `HtmlLite`, if detail page extraction is used, use detailPage.linkSelector and detailPage.detailMappings with string selectors only.
+- For `HtmlLite`, use `fieldTransforms` only for deterministic low-risk string cleanup: `trim`, `collapseWhitespace`, `removePrefix`, `removeSuffix`, `replaceLiteral`, `stripWrappingQuotes`, `nullIfEqualsAny`.
+- For `HtmlLite`, avoid high-risk transform requests such as regex/expression execution or multi-field semantic reconstruction.
 - For `HtmlLite`, allowed pagination.type values are `nextLink`, `queryIncrement`, `pathIncrement`, `fixedUrls`.
-- Do not include unsupported fields such as `sourceName`, `baseUrl`, or `transforms` inside `schemaDefinition`.
+- Do not include unsupported fields such as `sourceName`, `baseUrl`, or top-level `transforms` inside `schemaDefinition`.
 - Do not use placeholder `literal:` time values in final handoff output unless no real time can be extracted from list or detail pages.
 
 Output exactly three things and nothing else:

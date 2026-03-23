@@ -20,9 +20,21 @@ This reference is shared by both tracks:
 - Selector language: limited CSS-like selectors plus `xpath=`
 - `detailPage.linkSelector` must resolve to a URL
 - `detailPage.detailMappings` run against detail-page DOM
+- `fieldTransforms` supports deterministic low-risk per-field cleanup after extraction
 - Detail-page enrichment runs when both `detailPage.enabled=true` and `CALENDARAPP_HTMLLITE_DETAIL_ENRICHMENT_ENABLED` is not set to disable it
 - `pagination.type` allowed values: `nextLink`, `queryIncrement`, `pathIncrement`, `fixedUrls`
 - `schemaDefinition` must be sent as a JSON string in API payloads
+
+Low-risk `fieldTransforms` types:
+- `trim`
+- `collapseWhitespace`
+- `removePrefix`
+- `removeSuffix`
+- `replaceLiteral`
+- `stripWrappingQuotes`
+- `nullIfEqualsAny`
+
+Avoid high-risk transform patterns such as regex/expression execution or cross-field semantic reconstruction.
 
 ## AI-First Workflow From A Starting URL
 
@@ -86,5 +98,6 @@ Quick interpretation:
 
 See also:
 - [API Workflow](api-workflow.md)
+- [Schema Basics](schema-basics.md)
 - [Validation Checklist](validation-checklist.md)
 - [Troubleshooting](troubleshooting.md)

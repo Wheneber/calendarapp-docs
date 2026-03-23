@@ -20,6 +20,8 @@ Recommended additional checks:
 - URLs resolve to canonical event pages (not list-only links)
 - detailPage.linkSelector resolves within the card scope
 - runtime flag `CALENDARAPP_HTMLLITE_DETAIL_ENRICHMENT_ENABLED` is enabled when detail mappings are expected to populate fields
+- when `fieldTransforms` are present, each transform is deterministic and low-risk (`trim`, `collapseWhitespace`, `removePrefix`, `removeSuffix`, `replaceLiteral`, `stripWrappingQuotes`, `nullIfEqualsAny`)
+- high-risk transform patterns are not used (regex/expression execution, multi-field semantic reconstruction)
 
 ## Geolocation Quality Gate
 

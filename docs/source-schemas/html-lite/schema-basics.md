@@ -68,6 +68,52 @@ Step 1:
 
 Step 2: add `id`, pagination, and detail-page mappings after Step 1 returns non-zero events.
 
+## Field Transforms (Low Risk)
+
+Use `fieldTransforms` for deterministic per-field string cleanup after extraction and before validation.
+
+Supported low-risk transform types:
+
+- `trim`
+- `collapseWhitespace`
+- `removePrefix`
+- `removeSuffix`
+- `replaceLiteral`
+- `stripWrappingQuotes`
+- `nullIfEqualsAny`
+
+Important:
+
+- Keep transforms simple and local to one field.
+- Prefer exact literal cleanup over broad patterns.
+- Do not introduce regex/expression transforms in HtmlLite schemas.
+
+Example:
+
+```json
+{
+  "eventCardSelector": "div.event-card",
+  "mappings": {
+    "title": "h3",
+    "startTime": "time::attr(datetime)",
+    "location": ".event-location",
+    "url": "a::attr(href)"
+  },
+  "fieldTransforms": {
+    "location": [
+      { "type": "removePrefix", "value": "Event location:", "ignoreCase": true },
+      { "type": "stripWrappingQuotes" },
+      { "type": "collapseWhitespace" },
+      { "type": "trim" },
+      { "type": "nullIfEqualsAny", "values": ["Online Meeting", "TBD"], "ignoreCase": true }
+    ]
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime", "url"]
+  }
+}
+```
+
 ## Common Invalid Shapes
 
 ### Do not add unsupported top-level fields
@@ -89,7 +135,7 @@ Invalid:
 Why invalid:
 - `sourceName` and `baseUrl` are not part of `schemaDefinition`
 
-### Do not add `transforms`
+### Do not add top-level `transforms`
 
 Invalid:
 
@@ -109,7 +155,8 @@ Invalid:
 ```
 
 Why invalid:
-- `transforms` is not part of the HtmlLite schema
+- top-level `transforms` is not part of the HtmlLite schema
+- use `fieldTransforms` instead for safe per-field cleanup
 
 ### Use `venueAddress`, not `address`
 

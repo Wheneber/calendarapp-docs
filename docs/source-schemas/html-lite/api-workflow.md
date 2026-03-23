@@ -14,6 +14,16 @@ Include:
 - feedUrl
 - schemaDefinition as JSON string
 
+If location-like text includes labels/placeholders, use `fieldTransforms` for deterministic low-risk cleanup.
+Supported low-risk types:
+- `trim`
+- `collapseWhitespace`
+- `removePrefix`
+- `removeSuffix`
+- `replaceLiteral`
+- `stripWrappingQuotes`
+- `nullIfEqualsAny`
+
 Use test-fetch while refining selectors so you do not create unnecessary draft revisions.
 
 ## Step 2: Submit Community Draft (With Built-in Validation)
@@ -145,7 +155,17 @@ $schemaObject = @{
     id = 'a::attr(href)'
     title = 'h3'
     startTime = 'xpath=.//time[@datetime]::attr(datetime)'
+    location = '.event-location'
     url = 'a::attr(href)'
+  }
+  fieldTransforms = @{
+    location = @(
+      @{ type = 'removePrefix'; value = 'Event location:'; ignoreCase = $true },
+      @{ type = 'stripWrappingQuotes' },
+      @{ type = 'collapseWhitespace' },
+      @{ type = 'nullIfEqualsAny'; values = @('Online Meeting','Online','TBD'); ignoreCase = $true },
+      @{ type = 'trim' }
+    )
   }
   validation = @{
     requiredFields = @('title','startTime')

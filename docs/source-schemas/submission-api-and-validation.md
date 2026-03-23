@@ -299,6 +299,20 @@ Why invalid:
 - `baseUrl` and `transforms` are not part of the HtmlLite contract.
 - `url` and `imageUrl` are already resolved to absolute URLs downstream when valid relative links are captured.
 
+Use `fieldTransforms` for low-risk per-field cleanup instead of top-level `transforms`.
+
+Supported low-risk HtmlLite transform types:
+
+- `trim`
+- `collapseWhitespace`
+- `removePrefix`
+- `removeSuffix`
+- `replaceLiteral`
+- `stripWrappingQuotes`
+- `nullIfEqualsAny`
+
+Avoid high-risk transform patterns such as regex/expression evaluation or cross-field reconstruction.
+
 ### Invalid: unsupported `regex:` mapping syntax
 
 ```json
