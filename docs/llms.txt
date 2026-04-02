@@ -38,6 +38,12 @@ source type. Use them to validate or generate a `schemaDefinition` before callin
 - [JsonApi V2 schemaDefinition JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/json-api-v2.schema.json)
 - [HtmlLite schemaDefinition JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/html-lite.schema.json)
 
+## API request envelope contract (JSON Schema)
+
+Defines the valid payload structure for both test-fetch and community-submissions endpoints.
+
+- [Submission Request JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/submission-request.schema.json) — describes name, description, type, feedUrl, schemaDefinition, metadata fields
+
 ## AI agent documentation
 
 - [Autonomous Runbook](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/ai/source-onboarding/runbook.md)

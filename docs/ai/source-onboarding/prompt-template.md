@@ -17,18 +17,22 @@ Generate a calendar schema for this feed:
 Steps:
 1. First, read the schema index and guidelines: https://martinisaksen.github.io/calendarapp-docs/llms.txt
 2. From that index, read: choose-source-type.md and submission-api-and-validation.md
-3. Browse <FEED_URL> to determine the source type (Ics, Rss, JsonApi, or HtmlLite)
-4. Generate the complete schema including name, description, feedUrl, schemaDefinition, and metadata
-5. Test the schema by POSTing to http://localhost:5047/api/source-schemas/test-fetch
-6. If successful (eventCount > 0), submit the exact same payload to http://localhost:5047/api/source-schemas/community-submissions
-7. Print the schema ID and event count
+3. Read the submission request schema: https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/submission-request.schema.json
+4. Browse <FEED_URL> to determine the source type (Ics, Rss, JsonApi, or HtmlLite)
+5. Generate the complete schema payload, validating against the submission request schema
+6. Test the schema by POSTing to http://localhost:5047/api/source-schemas/test-fetch
+7. If successful (eventCount > 0), submit the exact same payload to http://localhost:5047/api/source-schemas/community-submissions
+8. Print the schema ID and event count
 
-For Ics sources: schemaDefinition must only contain `validation` or be `{}`. Do not add url, mappings, transforms, or sourceType.
+IMPORTANT CONSTRAINTS (from submission-request.schema.json):
+- `schemaDefinition` must be a JSON STRING, not a JSON object
+- Metadata fields: ONLY use location, region, category, language, contactEmail, or estimatedEventCount. Custom fields are not allowed.
+- For Ics sources: schemaDefinition should be `"{}"` or validation-only (no mappings, eventMapping, transforms, sourceType, url, etc.)
 
 Output:
 1. The source type chosen (Ics/Rss/JsonApi/HtmlLite)
 2. Brief evidence (why this type)
-3. The complete JSON payload (name, description, type, feedUrl, schemaDefinition, metadata)
+3. The complete JSON payload (validate against the schema)
 4. PowerShell commands for both test and submit (if capable)
 5. After testing: "Schema ID: [id], Events parsed: [count], Status: [success/error]"
 

@@ -14,6 +14,8 @@ Do not use admin-only approval or trigger endpoints as a community contributor.
 
 Both `test-fetch` and `community-submissions` accept the same payload structure. Build once, test once, submit once:
 
+**Machine-readable schema:** See [submission-request.schema.json](submission-request.schema.json) for the complete JSON Schema definition. Use this to validate or generate payloads programmatically.
+
 ```json
 {
   "name": "Example Source",
@@ -36,10 +38,23 @@ Both `test-fetch` and `community-submissions` accept the same payload structure.
 
 - `type` must be one of `Ics`, `Rss`, `JsonApi`, `HtmlLite`
 - `feedUrl` is required and must be a valid absolute URL
-- `schemaDefinition` must be sent as a JSON string, not a nested object
+- **`schemaDefinition` must be sent as a JSON string, not a nested object** — wrap your JSON in quotes: `"{}"` or `"{\\"key\\":\\"value\\"}"`
 - `schemaDefinition` can be up to 200000 characters
 - `url` and `eventMapping` are not valid top-level submission fields
 - `name` and `description` are required for submission; `metadata` is recommended
+
+**Metadata fields** (all optional, but recommended):
+
+| Field | Type | Example |
+|-------|------|---------|
+| `location` | string | `"Seattle, WA"` or `"Pike Place Market"` |
+| `region` | string | `"WA"` or `"Pacific Northwest"` |
+| `category` | string | `"community"`, `"government"`, `"entertainment"`, or similar |
+| `language` | string | `"en"`, `"es"`, `"fr"` (ISO 639-1 codes) |
+| `contactEmail` | string | `"admin@example.org"` for questions about this source |
+| `estimatedEventCount` | integer | `50` (approximately how many events per month) |
+
+⚠️ **Do not add custom metadata fields** — use only the fields listed above. Extra fields are ignored or may cause validation errors.
 
 `schemaDefinition` must contain only fields supported by the selected source type. Do not include wrapper or note fields such as:
 
@@ -89,6 +104,65 @@ This is a common cross-contract mistake when using examples from other systems.
 ```
 
 For `Ics`, `schemaDefinition` is typically `{}` or validation-only because the parser reads RFC 5545 fields directly.
+
+---
+
+## Common Mistakes (And How to Avoid Them)
+
+### ❌ Mistake 1: `schemaDefinition` as an object instead of a string
+
+**Wrong:**
+```json
+{
+  "schemaDefinition": {}
+}
+```
+
+**Right:**
+```json
+{
+  "schemaDefinition": "{}"
+}
+```
+
+**Why:** The backend expects a JSON string. If you're using PowerShell or JavaScript, wrap your JSON in quotes or use `.ConvertTo-Json -Depth 5`.
+
+---
+
+### ❌ Mistake 2: Custom metadata fields
+
+**Wrong:**
+```json
+{
+  "metadata": {
+    "source": "ridgefieldwa.us",
+    "city": "Ridgefield",
+    "state": "WA",
+    "country": "USA",
+    "format": "iCalendar"
+  }
+}
+```
+
+**Right:**
+```json
+{
+  "metadata": {
+    "location": "Ridgefield, WA",
+    "region": "WA",
+    "category": "government",
+    "language": "en"
+  }
+}
+```
+
+**Why:** The API only recognizes specific metadata fields: `location`, `region`, `category`, `language`, `contactEmail`, and `estimatedEventCount`. Custom fields are ignored or rejected. Use `location` to combine city/state info; it will be geocoded automatically.
+
+---
+
+### ❌ Mistake 3: Submitting before testing
+
+Always test first with `/api/source-schemas/test-fetch`. If test returns `eventCount: 0`, debug before submitting. A submission with zero events will be rejected or marked for admin review.
 
 ---
 
