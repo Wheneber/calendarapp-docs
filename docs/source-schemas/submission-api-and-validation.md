@@ -12,7 +12,7 @@ Do not use admin-only approval or trigger endpoints as a community contributor.
 
 ## Shared Request Envelope
 
-Every submission uses the same top-level fields:
+Both `test-fetch` and `community-submissions` accept the same payload structure. Build once, test once, submit once:
 
 ```json
 {
@@ -32,13 +32,14 @@ Every submission uses the same top-level fields:
 }
 ```
 
-Important:
+**Field requirements:**
 
 - `type` must be one of `Ics`, `Rss`, `JsonApi`, `HtmlLite`
 - `feedUrl` is required and must be a valid absolute URL
 - `schemaDefinition` must be sent as a JSON string, not a nested object
 - `schemaDefinition` can be up to 200000 characters
 - `url` and `eventMapping` are not valid top-level submission fields
+- `name` and `description` are required for submission; `metadata` is recommended
 
 `schemaDefinition` must contain only fields supported by the selected source type. Do not include wrapper or note fields such as:
 
@@ -52,7 +53,7 @@ Those do not belong in the submitted schema body.
 
 This is a common cross-contract mistake when using examples from other systems.
 
-Wrong for this API:
+**Common mistake** (from other calendar APIs):
 
 ```json
 {
@@ -70,22 +71,12 @@ Wrong for this API:
 }
 ```
 
-Right for `POST /api/source-schemas/test-fetch`:
-
-```json
-{
-  "type": "Ics",
-  "feedUrl": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
-  "schemaDefinition": "{}"
-}
-```
-
-Right for `POST /api/source-schemas/community-submissions`:
+**Correct payload** (works for both test-fetch and community-submissions):
 
 ```json
 {
   "name": "La Center Calendar",
-  "description": "Public ICS feed",
+  "description": "Public ICS feed from La Center, WA",
   "type": "Ics",
   "feedUrl": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
   "schemaDefinition": "{}",
@@ -99,7 +90,21 @@ Right for `POST /api/source-schemas/community-submissions`:
 
 For `Ics`, `schemaDefinition` is typically `{}` or validation-only because the parser reads RFC 5545 fields directly.
 
+---
+
 ## Contributor-Safe Workflow
+
+### Environment: Choose Your Endpoint
+
+Before you start, know which environment you're working in:
+
+| Environment | Endpoint Base |
+|-------------|---------------|
+| **Local development** (you run backend locally) | `http://localhost:5047/api/source-schemas` |
+| **GitHub Codespaces / Docker** | Check your backend's exposed port (usually `5047` or `5000`) |
+| **Production / Hosted** | `https://calendarapp-api.onrender.com/api/source-schemas` (for testing only; production submissions use a different endpoint) |
+
+⚠️ **Only use `localhost:5047` for development, testing, and iteration. Production contributors submit via the website form or documented production endpoint.**
 
 ### 1. Load A Starter Template
 
@@ -114,17 +119,24 @@ If the templates endpoint does not include the exact type or shape you need, sta
 
 ### 2. Test Fetch Before Submitting
 
-Use `POST /api/source-schemas/test-fetch` while refining the schema.
-
-Example:
+Use `POST /api/source-schemas/test-fetch` while refining the schema. Send the complete payload you plan to submit:
 
 ```json
 {
+  "name": "Example RSS Feed",
+  "description": "Community events from Example Org",
   "type": "Rss",
   "feedUrl": "https://example.org/events/feed.rss",
-  "schemaDefinition": "{\"extractionRules\":{\"title\":\"title\",\"startTime\":\"pubDate\"},\"validation\":{\"requiredFields\":[\"title\",\"startTime\"]}}"
+  "schemaDefinition": "{\"extractionRules\":{\"title\":\"title\",\"startTime\":\"pubDate\"},\"validation\":{\"requiredFields\":[\"title\",\"startTime\"]}}",
+  "metadata": {
+    "location": "Example City",
+    "region": "WA",
+    "category": "community"
+  }
 }
 ```
+
+Test-fetch validates the schema parsing and returns event samples. If test succeeds with good event count, proceed to submission with the same payload.
 
 ### 3. Submit The Draft
 

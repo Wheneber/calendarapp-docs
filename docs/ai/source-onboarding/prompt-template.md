@@ -16,22 +16,23 @@ Generate a calendar schema for this feed:
 
 Steps:
 1. First, read the schema index and guidelines: https://martinisaksen.github.io/calendarapp-docs/llms.txt
-2. From that index, read the source type guide (choose-source-type.md) and submission guide (submission-api-and-validation.md)
+2. From that index, read: choose-source-type.md and submission-api-and-validation.md
 3. Browse <FEED_URL> to determine the source type (Ics, Rss, JsonApi, or HtmlLite)
-4. Generate a complete, valid schema for that type
-5. Test the schema by calling the test-fetch endpoint
-6. If the test succeeds, submit the schema to the community-submissions endpoint
+4. Generate the complete schema including name, description, feedUrl, schemaDefinition, and metadata
+5. Test the schema by POSTing to http://localhost:5047/api/source-schemas/test-fetch
+6. If successful (eventCount > 0), submit the exact same payload to http://localhost:5047/api/source-schemas/community-submissions
 7. Print the schema ID and event count
 
 For Ics sources: schemaDefinition must only contain `validation` or be `{}`. Do not add url, mappings, transforms, or sourceType.
 
 Output:
 1. The source type chosen (Ics/Rss/JsonApi/HtmlLite)
-2. Brief evidence (why this type, endpoint/selector found, sample events if HtmlLite)
-3. The schemaDefinition JSON
-4. PowerShell commands to test and submit (if capable), or the JSON payload for manual submission
+2. Brief evidence (why this type)
+3. The complete JSON payload (name, description, type, feedUrl, schemaDefinition, metadata)
+4. PowerShell commands for both test and submit (if capable)
+5. After testing: "Schema ID: [id], Events parsed: [count], Status: [success/error]"
 
-After testing, if the event count is >0, proceed to submit. If it's 0, explain what to debug and ask for clarification before resubmitting.
+Use the same payload for both test and submit — no changes needed between them.
 ```
 
 ---
