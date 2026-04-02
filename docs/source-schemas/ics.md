@@ -4,26 +4,26 @@ Use `Ics` when the source publishes a valid iCalendar feed. This is usually the 
 
 For a machine-readable authoring contract, use the contributor-facing [Ics JSON Schema](ics.schema.json).
 
-## When To Use It
+## ⚠️ ONLY Valid Format For ICS
 
-Use `Ics` when:
+The `Ics` source schema submission to CalendarApp **has exactly this structure and no other**:
 
-- the URL returns a `.ics` file or `text/calendar`
-- the feed already includes title, start, end, location, description, or event URL
-- the source has stable event UIDs
+```json
+{
+  "name": "<source name>",
+  "description": "<source description>",
+  "type": "Ics",
+  "feedUrl": "<url-that-returns-ics-feed>",
+  "schemaDefinition": "<json-string-with-only-validation>",
+  "metadata": {
+    "location": "<location>",
+    "category": "<category>",
+    "region": "<region>"
+  }
+}
+```
 
-Do not use `Ics` when you only have HTML or JSON.
-
-## Minimal `schemaDefinition`
-
-`Ics` does not require field mappings. A validation-only schema is enough for most sources.
-
-The submission envelope is still required at the top level:
-- `type`
-- `feedUrl`
-- `schemaDefinition` (JSON string)
-
-Do not submit ICS payloads with top-level `url` or `eventMapping` fields.
+The `schemaDefinition` is a **compact JSON string** containing **only `validation`**:
 
 ```json
 {
@@ -35,13 +35,31 @@ Do not submit ICS payloads with top-level `url` or `eventMapping` fields.
 }
 ```
 
+or for test-fetch, simply:
+
+```json
+{}
+```
+
+**Forbidden at all levels:** `url`, `mappings`, `eventMapping`, `transforms`, `recurrence`, `sourceType`, `eventDefaults`, `allDay`.
+
+## When To Use It
+
+Use `Ics` when:
+
+- the URL returns a `.ics` file or `text/calendar`
+- the feed already includes title, start, end, location, description, or event URL
+- the source has stable event UIDs
+
+Do not use `Ics` when you only have HTML or JSON.
+
 ## Test-Fetch Example
 
 ```json
 {
   "type": "Ics",
   "feedUrl": "https://example.org/events.ics",
-  "schemaDefinition": "{\"validation\":{\"requiredFields\":[\"title\",\"startTime\"]}}"
+  "schemaDefinition": "{}"
 }
 ```
 

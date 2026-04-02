@@ -55,7 +55,7 @@ Instructions:
 
 Schema contract (must follow exactly):
 - `schemaDefinition` must be valid JSON and will be sent as a compact JSON string.
-- For `Ics`, `schemaDefinition` may only contain `validation`. Do not include `mappings`, `eventMapping`, `url`, or any other field — the parser reads RFC 5545 fields (`SUMMARY`, `DTSTART`, `DTEND`, `DESCRIPTION`, `LOCATION`, `URL`, `UID`) directly from the feed. No mapping is required or supported.
+- For `Ics`, `schemaDefinition` may only contain `validation` (or be `{}`). Do not include `mappings`, `eventMapping`, `transforms`, `recurrence`, `sourceType`, `eventDefaults`, `url`, or any other field — they cause backend validation failure. The parser reads RFC 5545 fields directly. Before output, validate against https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/ics.schema.json; reject any `schemaDefinition` with unsupported fields.
 - For `Rss`, use `extractionRules` and map at least `title` and `startTime`.
 - For `JsonApi`, include `schemaVersion: 2` for new sources unless you are intentionally preserving a legacy v1 schema.
 - For `JsonApi`, include `eventArrayPath` and `mappings`.
@@ -123,6 +123,9 @@ Before finalizing output, self-check:
 - schema matches the chosen source type
 - a higher-priority source type was not incorrectly skipped
 - all required fields for that source type are present
+- **For Ics:** `schemaDefinition` contains ONLY `validation` or is `{}`. If it contains `mappings`, `transforms`, `eventDefaults`, `recurrence`, `sourceType`, or any other field, reject and rebuild.
+- **For Ics:** top-level field is `feedUrl` (not `url`, `sourceUrl`, or `source`).
+- **For Ics:** top-level field is `type` with value `Ics` (not `sourceType` or `ics` or `ICS`).
 - event path points to repeated event records, not wrapper/config nodes
 - if `responseTransforms` are used, transformed required fields are populated and parseable
 - requiredFields are present in mapped output
