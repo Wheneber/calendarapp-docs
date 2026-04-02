@@ -10,11 +10,14 @@ Use this prompt with **standard ChatGPT or any plain chat interface** to choose 
 
 ChatGPT cannot call APIs on your behalf. Instead, this prompt instructs it to:
 
-1. Browse the feed URL and determine whether the best source type is `Ics`, `Rss`, `JsonApi`, or `HtmlLite`
-2. Build the complete `schemaDefinition`
-3. Output copy-pasteable PowerShell commands for test-fetch and community submission
+1. Read the raw documentation markdown files on GitHub (plain text — no JavaScript required)
+2. Browse the feed URL and determine whether the best source type is `Ics`, `Rss`, `JsonApi`, or `HtmlLite`
+3. Build the complete `schemaDefinition`
+4. Output copy-pasteable PowerShell commands for test-fetch and community submission
 
 The generated output is successful only if it is deterministic and directly executable with no placeholders.
+
+> **Why raw GitHub links?** The rendered docs site loads correctly in a browser but some AI tools cannot execute JavaScript. Raw `raw.githubusercontent.com` URLs return plain markdown that any LLM can read without JS. The prompt below uses these links directly.
 
 ---
 
@@ -25,7 +28,10 @@ Copy the block below, fill in the inputs, and paste it into ChatGPT.
 ---
 
 ```
-Before answering, read the docs under **Choose A Source Type** and **Submission API And Validation** at https://martinisaksen.github.io/calendarapp-docs/.
+Before answering, read the following raw documentation files (plain text, no JavaScript required):
+- Choose A Source Type: https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/choose-source-type.md
+- Submission API And Validation: https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/submission-api-and-validation.md
+- Full page index (all raw links): https://martinisaksen.github.io/calendarapp-docs/llms.txt
 
 Build a complete contributor-safe SourceSchema submission for the following source.
 
