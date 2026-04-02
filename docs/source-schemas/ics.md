@@ -18,6 +18,13 @@ Do not use `Ics` when you only have HTML or JSON.
 
 `Ics` does not require field mappings. A validation-only schema is enough for most sources.
 
+The submission envelope is still required at the top level:
+- `type`
+- `feedUrl`
+- `schemaDefinition` (JSON string)
+
+Do not submit ICS payloads with top-level `url` or `eventMapping` fields.
+
 ```json
 {
   "validation": {
@@ -37,6 +44,50 @@ Do not use `Ics` when you only have HTML or JSON.
   "schemaDefinition": "{\"validation\":{\"requiredFields\":[\"title\",\"startTime\"]}}"
 }
 ```
+
+## Wrong Vs Right Payload Shape
+
+Wrong for `test-fetch` and submissions in this API contract:
+
+```json
+{
+  "type": "ics",
+  "url": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
+  "eventMapping": {
+    "id": "uid",
+    "title": "summary",
+    "description": "description",
+    "location": "location",
+    "startTime": "dtstart",
+    "endTime": "dtend",
+    "url": "url"
+  }
+}
+```
+
+Right for this API contract (validation-only `schemaDefinition`):
+
+```json
+{
+  "type": "Ics",
+  "feedUrl": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
+  "schemaDefinition": "{}"
+}
+```
+
+Also valid when you want explicit validation guards:
+
+```json
+{
+  "type": "Ics",
+  "feedUrl": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
+  "schemaDefinition": "{\"validation\":{\"requiredFields\":[\"title\",\"startTime\"],\"minEventsPerFetch\":1}}"
+}
+```
+
+Why this is correct:
+- `Ics` parser reads RFC 5545 fields directly (for example `UID`, `SUMMARY`, `DESCRIPTION`, `LOCATION`, `DTSTART`, `DTEND`).
+- explicit `eventMapping` is not required for standard ICS feeds.
 
 ## Community Submission Example
 

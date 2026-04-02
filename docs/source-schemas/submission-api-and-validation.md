@@ -38,6 +38,7 @@ Important:
 - `feedUrl` is required and must be a valid absolute URL
 - `schemaDefinition` must be sent as a JSON string, not a nested object
 - `schemaDefinition` can be up to 200000 characters
+- `url` and `eventMapping` are not valid top-level submission fields
 
 `schemaDefinition` must contain only fields supported by the selected source type. Do not include wrapper or note fields such as:
 
@@ -46,6 +47,57 @@ Important:
 - `transforms`
 
 Those do not belong in the submitted schema body.
+
+## Wrong Vs Right: ICS Request Envelope
+
+This is a common cross-contract mistake when using examples from other systems.
+
+Wrong for this API:
+
+```json
+{
+  "type": "ics",
+  "url": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
+  "eventMapping": {
+    "id": "uid",
+    "title": "summary",
+    "description": "description",
+    "location": "location",
+    "startTime": "dtstart",
+    "endTime": "dtend",
+    "url": "url"
+  }
+}
+```
+
+Right for `POST /api/source-schemas/test-fetch`:
+
+```json
+{
+  "type": "Ics",
+  "feedUrl": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
+  "schemaDefinition": "{}"
+}
+```
+
+Right for `POST /api/source-schemas/community-submissions`:
+
+```json
+{
+  "name": "La Center Calendar",
+  "description": "Public ICS feed",
+  "type": "Ics",
+  "feedUrl": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
+  "schemaDefinition": "{}",
+  "metadata": {
+    "location": "La Center",
+    "category": "community",
+    "region": "WA"
+  }
+}
+```
+
+For `Ics`, `schemaDefinition` is typically `{}` or validation-only because the parser reads RFC 5545 fields directly.
 
 ## Contributor-Safe Workflow
 

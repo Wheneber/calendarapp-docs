@@ -34,6 +34,11 @@ Use this track when an agent can browse pages and execute API calls end-to-end, 
 
 ## Source Onboarding Lifecycle
 
+Contract reminder for ICS onboarding:
+- use top-level `type`, `feedUrl`, and `schemaDefinition`
+- do not use top-level `url` or `eventMapping` for this API
+- keep `Ics` `schemaDefinition` minimal (`{}` or validation-only) unless stricter validation is needed
+
 1. Discover a starting URL and identify the most stable source type.
 2. Build the smallest valid `schemaDefinition` for that type.
 3. Validate with `POST /api/source-schemas/test-fetch`.

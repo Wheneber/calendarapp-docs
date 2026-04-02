@@ -147,6 +147,9 @@ For `Rss`:
 
 For `Ics`:
 - rely on the feed for title, start, end, location, and UID when present
+- send top-level `feedUrl` (not `url`) in test-fetch/submission payloads
+- keep `schemaDefinition` minimal (`{}` or validation-only) unless stricter checks are needed
+- do not add `eventMapping` for standard ICS feeds
 
 Mapping DSL rules:
 - mapping values must be strings, never objects
