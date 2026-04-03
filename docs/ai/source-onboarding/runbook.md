@@ -18,9 +18,17 @@ Use this runbook when an AI agent can execute the full source onboarding loop fr
 ## Required Reading
 
 Before execution, read:
-- [Choose A Source Type](../../source-schemas/choose-source-type.md)
-- [Submission API And Validation](../../source-schemas/submission-api-and-validation.md)
-- the type-specific page that matches the chosen source type
+- [llms.txt](https://martinisaksen.github.io/calendarapp-docs/llms.txt) to discover canonical docs and schema files
+- [Choose A Source Type](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/choose-source-type.md)
+- [Submission API And Validation](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/submission-api-and-validation.md)
+- [Submission Request JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/submission-request.schema.json)
+- the type-specific page that matches the chosen source type (use raw GitHub URL from llms.txt)
+
+Type-specific schemaDefinition JSON Schemas:
+- [ICS schemaDefinition JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/ics.schema.json)
+- [RSS schemaDefinition JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/rss.schema.json)
+- [JsonApi V2 schemaDefinition JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/json-api-v2.schema.json)
+- [HtmlLite schemaDefinition JSON Schema](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/html-lite.schema.json)
 
 ## Input Contract
 
@@ -135,6 +143,16 @@ For every type:
 - `schemaDefinition` must serialize as a JSON string in the request body
 - prefer the contributor-safe workflow: `test-fetch` first, then `community-submissions`
 - never call admin approval endpoints
+
+Request envelope preflight checks (mandatory before POST):
+1. Validate request JSON against Submission Request JSON Schema.
+2. Parse `schemaDefinition` string into JSON and validate against the selected type's schemaDefinition JSON Schema.
+3. Reject payloads that use cross-contract field names:
+  - `sourceName` -> use `name`
+  - `sourceUrl` or `url` -> use `feedUrl`
+  - `sourceType` -> use `type`
+  - top-level `contactEmail` -> use `metadata.contactEmail`
+4. For `Ics`, keep `schemaDefinition` as `{}` or validation-only; do not generate `eventMapping`, `mappings`, `transforms`, or parser-specific extraction blocks.
 
 For `JsonApi`:
 - new sources should default to `schemaVersion = 2`
