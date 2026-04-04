@@ -1,5 +1,37 @@
 # Validation Checklist
 
+## Early Validation (Before Final Submission)
+
+Run these checks early to catch issues before submitting the schema. This saves iteration cycles.
+
+### Selector Validation
+
+1. **Test eventCardSelector in isolation**
+   - Run `test-fetch` with only `eventCardSelector` and required fields (`title`, `startTime`)
+   - Verify `totalEventsParsed` is non-zero and reasonable (matches count on source page)
+   - If zero, use browser console to verify selector works: `document.querySelectorAll('.your-selector')`
+
+2. **Check for date format compatibility**
+   - In `sampleEvents`, verify all `startTime` values parse cleanly
+   - Common failures:
+     - Date ranges (e.g., "May 8 - 24, 2026") → Events silently dropped
+     - Non-standard formats ("TBD", "Ongoing") → Silent drop
+   - If low parse count, check if source uses date ranges (see [time-handling.md](time-handling.md) for workarounds)
+
+3. **Validate mapping selectors**
+   - Spot-check 3-5 sample events against source page
+   - Verify title, date, URL are correctly extracted
+   - If any field is null/empty in samples, fix selector before resubmitting
+
+### Pre-Submission Quick Checklist
+
+- [ ] Run `test-fetch` and check `totalEventsParsed` is non-zero
+- [ ] Review `sampleEvents` array from test-fetch (not just count)
+- [ ] Compare samples against 3+ visible events on source page
+- [ ] Verify date formats are single dates (not ranges)
+- [ ] Confirm selectors use XPath (not CSS like `[id^="..."]`)
+- [ ] Check required fields have values in samples (title, startTime)
+
 ## Quality Gates Before Submission
 
 Require all of the following:

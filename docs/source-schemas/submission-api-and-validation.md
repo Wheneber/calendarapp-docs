@@ -18,6 +18,13 @@ CalendarApp uses the `schemaDefinition` v3 contract for new source authoring and
 
 The v3 model is the active clean-break contract for contributor-facing payloads.
 
+Additional v3 references:
+
+- Migration: [Pipeline V3 Migration Guide](v3/migration-guide.md)
+- Allowed calendar/event pairs: [Pipeline V3 Type Pair Reference](v3/type-pair-reference.md)
+- Event input constraints: [Pipeline V3 Event Input Constraints](v3/event-input-constraints.md)
+- Html enrichment patterns: [Html Detail Enrichment Patterns](v3/html-detail-enrichment.md)
+
 Do not use admin-only approval or trigger endpoints as a community contributor.
 
 ## Shared Request Envelope
@@ -49,9 +56,15 @@ Both `test-fetch` and `community-submissions` accept the same payload structure.
 - `type` must be one of `Ics`, `Rss`, `JsonApi`, `HtmlLite`
 - `feedUrl` is required and must be a valid absolute URL
 - **`schemaDefinition` must be sent as a JSON string, not a nested object** — wrap your JSON in quotes: `"{}"` or `"{\\"key\\":\\"value\\"}"`
+- `schemaDefinition` must use v3 shape with `schemaVersion: 3` and `pipeline`
 - `schemaDefinition` can be up to 200000 characters
 - `url` and `eventMapping` are not valid top-level submission fields
 - `name` and `description` are required for submission; `metadata` is recommended
+
+Current v3 guardrails to account for during authoring:
+
+- `pipeline.event.input.field` currently expects `eventUrl` for phase-2 scaffolding when `event.type` is `Html` or `Json`
+- Some type pairs are rejected (for example `Html -> None`); use the allowlist in [Pipeline V3 Type Pair Reference](v3/type-pair-reference.md)
 
 **Metadata fields** (all optional, but recommended):
 
@@ -173,6 +186,37 @@ For `Ics`, `schemaDefinition` is typically `{}` or validation-only because the p
 ### ❌ Mistake 3: Submitting before testing
 
 Always test first with `/api/source-schemas/test-fetch`. If test returns `eventCount: 0`, debug before submitting. A submission with zero events will be rejected or marked for admin review.
+
+### ❌ Mistake 4: Using unsupported event input field
+
+**Wrong (current phase-2 scaffolding):**
+```json
+{
+  "pipeline": {
+    "event": {
+      "type": "Html",
+      "input": { "mode": "calendarFieldUrl", "field": "url" }
+    }
+  }
+}
+```
+
+**Right:**
+```json
+{
+  "pipeline": {
+    "calendar": {
+      "parser": {
+        "mappings": { "eventUrl": "a@href" }
+      }
+    },
+    "event": {
+      "type": "Html",
+      "input": { "mode": "calendarFieldUrl", "field": "eventUrl" }
+    }
+  }
+}
+```
 
 ---
 
@@ -561,8 +605,11 @@ Supported low-risk HtmlLite transform types:
 - `replaceLiteral`
 - `stripWrappingQuotes`
 - `nullIfEqualsAny`
+- `regexReplace`
 
-Avoid high-risk transform patterns such as regex/expression evaluation or cross-field reconstruction.
+Use `regexReplace` only for deterministic cleanup (for example, removing a trailing second date from a multi-date field). Avoid cross-field reconstruction or expression-eval style transforms.
+
+See [HtmlLite Schema Basics](html-lite/schema-basics.md#field-transforms-low-risk) and [HtmlLite Time Handling](html-lite/time-handling.md#multi-date-strings--extracting-the-first-date-only) for examples.
 
 ### Invalid: unsupported `regex:` mapping syntax
 

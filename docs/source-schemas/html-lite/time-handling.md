@@ -48,6 +48,97 @@ Behavior:
 - verify timezone assumptions
 - verify AM/PM and all-day handling
 
+## Date Range Parsing & Silent Failures
+
+⚠️ **Critical Limitation:** Date ranges are NOT supported. When a date format cannot be parsed as a single datetime, the event is silently skipped (no error, just zero events parsed).
+
+### Examples of What Fails
+
+**Fails (events silently dropped):**
+- "May 8 - 24, 2026" ← Date range
+- "June 6 & 7, 2026" ← Multiple dates with ampersand
+- "June 27 - July 19, 2026" ← Cross-month range
+- "TBD" or "Call for dates" ← Unparseable text
+- "Ongoing" ← Non-datetime text
+
+**Succeeds (single dates parse cleanly):**
+- "April 18, 2026" ✓
+- "05/30/2026" ✓
+- "2026-12-13" ✓
+- "December 13, 2025" ✓
+
+### Debug Strategy When Parse Count is Low
+
+1. Run test-fetch and check `validation.totalEventsParsed` vs. expected count on source page
+2. If discrepancy exists, compare `sampleEvents` against the source
+3. **Common cause:** Date format uses ranges or special text that cannot parse
+4. Manual verification: Does each visible event have a single, standard date format?
+
+### Workarounds
+
+**Option 1: Extract only the first date from a range**
+```json
+"fieldTransforms": {
+  "startTime": [
+    { "type": "ReplaceLiteral", "value": " - ", "replacement": " RANGE_SEP " },
+    { "type": "ReplaceLiteral", "value": " RANGE_SEP ", "replacement": "|" }
+  ]
+}
+```
+Then use regex or post-processing to extract text before the pipe.
+
+**Option 2: Use detail page enrichment**
+If list pages show date ranges but detail pages have specific start/end times:
+- Set list `startTime` to a `literal:` placeholder
+- Enable `detailPage.enabled: true`
+- Map actual dates in `detailPage.detailMappings`
+
+**Option 3: Create separate sources**
+For venue+date combinations, create distinct sources:
+- Source 1: Events happening June 6
+- Source 2: Events happening June 7
+
+(Use filters or pagination to isolate by date)
+
+## Normalizing a.m./p.m. Abbreviations
+
+Standard date parsing does not recognize `a.m.` or `p.m.` — it requires `AM`/`PM`. If the source uses dotted abbreviations, normalize them with `ReplaceLiteral` transforms before any date parsing occurs.
+
+Also strip connector words such as `at` that appear between the date and time string.
+
+```json
+"fieldTransforms": {
+  "startTime": [
+    { "type": "ReplaceLiteral", "value": " at ", "replacement": " " },
+    { "type": "ReplaceLiteral", "value": "p.m.", "replacement": "PM" },
+    { "type": "ReplaceLiteral", "value": "a.m.", "replacement": "AM" },
+    { "type": "CollapseWhitespace" }
+  ]
+}
+```
+
+## Multi-Date Strings — Extracting the First Date Only
+
+Some performing arts sites encode multiple performance dates in a single string, for example:
+
+> `Saturday, April 11, 2026 at 7:00 p.m. & Sunday, April 12, 2026 at 3:00 p.m.`
+
+Use `RegexReplace` to strip everything from the delimiter onward **before** applying other date transforms. Apply it as the first transform in the chain.
+
+```json
+"fieldTransforms": {
+  "startTime": [
+    { "type": "RegexReplace", "value": " & .*$", "replacement": "" },
+    { "type": "ReplaceLiteral", "value": " at ", "replacement": " " },
+    { "type": "ReplaceLiteral", "value": "p.m.", "replacement": "PM" },
+    { "type": "ReplaceLiteral", "value": "a.m.", "replacement": "AM" },
+    { "type": "CollapseWhitespace" }
+  ]
+}
+```
+
+> **Note:** This chain captures only the first performance date. If the source needs a separate event entry per performance, an ICS or JSON-API feed is a better fit than HtmlLite.
+
 ## Default Behavior
 
 - EndTime defaults to StartTime + 1 hour when no endTime mapping is provided

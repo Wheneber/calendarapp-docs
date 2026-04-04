@@ -235,3 +235,45 @@ Summary of rules:
 - Timezone handling in the source is inconsistent
 
 See also: [Submission API And Validation](submission-api-and-validation.md)
+
+## Finding an ICS Feed from a Google Calendar Embed
+
+Some sources do not publish their own ICS feed. Instead, their events page embeds a Google Calendar iframe. You can still create an `Ics` source by extracting the underlying feed URL from the embed.
+
+Steps:
+
+1. View the page source (`Ctrl+U` in most browsers — or use a "View page source" option).
+2. Search for `calendar.google.com` and locate the `<iframe>` `src` attribute value.
+3. The `src` URL contains one or more `src=...` query parameters. Each value is a base64-encoded Google Calendar ID.
+4. Decode each base64 value. In PowerShell: `[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("PASTE_VALUE_HERE"))`. In a browser console: `atob("PASTE_VALUE_HERE")`. The decoded ID ends with `@group.calendar.google.com` or `@gmail.com`.
+5. URL-encode the decoded calendar ID (replace `@` with `%40`, `/` with `%2F`, etc.).
+6. Construct the ICS feed URL: `https://calendar.google.com/calendar/ical/{URL_ENCODED_CALENDAR_ID}/public/basic.ics`
+7. Test the URL in your browser or with `test-fetch`. A private or restricted calendar returns 404 or 403 — only submit public feeds.
+
+When a source embeds multiple Google Calendars (for example, one for performances and one for auditions), create a **separate ICS source submission** for each public calendar.
+
+## Using ICS Sources with the v3 Pipeline
+
+When writing a v3 `schemaDefinition` for an ICS feed, use `pipeline.calendar.type = "Ics"`. If the feed provides complete event data without any detail-page enrichment, `pipeline.event.type` must be `"None"`:
+
+```json
+{
+  "schemaVersion": 3,
+  "pipeline": {
+    "calendar": {
+      "type": "Ics",
+      "parser": {}
+    },
+    "event": {
+      "type": "None",
+      "input": { "mode": "none" },
+      "parser": {}
+    }
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime"]
+  }
+}
+```
+
+Do not set `pipeline.event.type` to `"Html"` for a plain ICS feed that needs no HTML enrichment — that combination requires a real HTML parser input configuration and will fail validation. Use `Ics → Html` only when you also need to fetch each event's detail page via `eventUrl`. See [v3 Pipeline Examples](v3/pipeline-examples.md) for the full matrix.

@@ -8,42 +8,62 @@ Fix:
 - serialize schemaDefinition as a compact JSON string before submission
 - verify request body uses `schemaDefinition: "{...}"` rather than nested object
 
+## schemaDefinition must be v3 with schemaVersion=3
+
+This means the payload is using legacy flat schema format.
+
+Fix:
+
+- add `schemaVersion: 3`
+- wrap parser config under `pipeline.calendar.parser`
+- add `pipeline.event`
+- follow [v3 migration guide](../v3/migration-guide.md)
+
+## phase 2 scaffolding currently supports only pipeline.event.input.field = eventUrl
+
+This means event-stage input is using a field name other than `eventUrl`.
+
+Fix:
+
+- map `eventUrl` in calendar mappings
+- use `"field": "eventUrl"` in `pipeline.event.input`
+- see [v3 event input constraints](../v3/event-input-constraints.md)
+
 ## validation.totalEventsParsed = 0
 
-- verify eventCardSelector first
-- verify startTime extraction and date format
-- prefer XPath for complex nested nodes
-- confirm source is static HTML and not JS-only
+**This is the #1 source creation issue.** Events silently drop when required fields fail to parse.
 
-If still zero, apply this fallback sequence:
+### Diagnostic Checklist (in order)
 
-1. Reduce `eventCardSelector` to a very stable repeated node (often title wrapper).
-2. Use minimal mappings only: `title`, `url`, parseable `startTime`.
-3. If list time text is unreliable, set temporary `startTime` to a `literal:` datetime.
-4. Enable `detailPage` and map `startDate` + `startTime` there.
-5. Add pagination after non-zero validation is achieved.
+1. **Verify eventCardSelector matches DOM nodes**
+   - Test in browser console: `document.querySelectorAll('YOUR_SELECTOR')`
+   - If zero results, selector is wrong
+   - **Common error:** CSS attribute selector `[id^="prefix"]` doesn't work in XPath
+   - **Fix:** Use XPath: `.//*[starts-with(@id, "prefix")]`
 
-Common causes of false zero results:
+2. **Check title mapping returns values**
+   - Verify mapping selector works on one card element
+   - If title is deeply nested, use `//` for any-depth matching instead of `/`
 
-- selector syntax uses unsupported CSS (`>`, `.a, .b`, pseudo-selectors)
-- `linkSelector` does not produce a detail URL
-- `startTime` cannot be parsed from list page
-- mappings are objects instead of strings
-- runtime flag `CALENDARAPP_HTMLLITE_DETAIL_ENRICHMENT_ENABLED` is disabled while schema relies on detail mappings
+3. **Check if startTime parses**
+   - Look at `sampleEvents` startTime values
+   - Common failure: Date ranges like "May 8 - 24, 2026" cause silent drops
+   - See [time-handling.md](time-handling.md#date-range-parsing--silent-failures) for date range solutions
 
-Additional causes:
-- `validation.requiredFields` includes fields not reliably mapped yet
-- selector scope mismatch (list-card selector used against detail DOM or vice versa)
+4. **Check validation.requiredFields**
+   - Ensure all required fields are actually mapped in `mappings`
+   - Remove fields from `requiredFields` if source doesn't provide them
 
-Quality anti-pattern:
-- non-zero parse counts can still hide missing description/address/media fields
-- if important fields are present on detail pages but absent in sample events, continue schema refinement
+### Debug Workflow
 
-Detail enrichment appears disabled unexpectedly:
-
-1. Confirm `detailPage.enabled` is true in schemaDefinition.
-2. Confirm `CALENDARAPP_HTMLLITE_DETAIL_ENRICHMENT_ENABLED` is enabled in runtime environment.
-3. Re-run test-fetch after updating environment configuration.
+1. Run `test-fetch` and compare `sampleEvents` output with visible events on page
+2. For each missing field, verify selector in browser
+3. Update selector and re-test until `totalEventsParsed` matches expected count
+4. Common XPath patterns:
+   - Any element with attribute starting with value: `.//*[starts-with(@id, "prefix")]`
+   - Element with exact attribute: `.//div[@id="exact-id"]`
+   - Any descendant: `.//span` or `.//*[contains(@class, "text")]`
+   - Get attribute value: Always ends with `/@attributeName`
 
 ## validation.isSuccess = false
 

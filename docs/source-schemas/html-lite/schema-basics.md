@@ -72,7 +72,7 @@ Step 2: add `id`, pagination, and detail-page mappings after Step 1 returns non-
 
 Use `fieldTransforms` for deterministic per-field string cleanup after extraction and before validation.
 
-Supported low-risk transform types:
+Supported transform types:
 
 - `trim`
 - `collapseWhitespace`
@@ -81,12 +81,13 @@ Supported low-risk transform types:
 - `replaceLiteral`
 - `stripWrappingQuotes`
 - `nullIfEqualsAny`
+- `regexReplace` — matches a regex pattern and replaces it with a fixed string. Use `value` for the pattern, `replacement` for the substitution string, and `ignoreCase` to control case sensitivity. See [Time Handling](time-handling.md) for worked examples.
 
 Important:
 
 - Keep transforms simple and local to one field.
-- Prefer exact literal cleanup over broad patterns.
-- Do not introduce regex/expression transforms in HtmlLite schemas.
+- Prefer `ReplaceLiteral` for exact string cleanup — use `RegexReplace` only when a deterministic literal replace cannot isolate the target substring.
+- Apply `RegexReplace` as the first transform in the chain when stripping a trailing portion of a string (for example, removing a second performance date).
 
 Example:
 
