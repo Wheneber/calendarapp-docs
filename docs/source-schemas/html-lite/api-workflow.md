@@ -66,7 +66,7 @@ Success example:
 {
   "sourceSchema": {
     "id": "1acba9be-d70c-435a-8efb-123e350638e5",
-    "name": "Example Events - HtmlLite",
+    "name": "Example Arts Center Calendar",
     "type": "HtmlLite",
     "feedUrl": "https://www.example.org/events",
     "status": "Draft"
@@ -94,7 +94,7 @@ Failure example:
 {
   "sourceSchema": {
     "id": "7d88c4a3-c9d4-4c4d-beb1-b9d71e590fa3",
-    "name": "Example Events - HtmlLite",
+    "name": "Example Arts Center Calendar",
     "type": "HtmlLite",
     "feedUrl": "https://www.example.org/events",
     "status": "Draft"
@@ -175,7 +175,7 @@ $schemaObject = @{
 $schemaDefinition = $schemaObject | ConvertTo-Json -Depth 20 -Compress
 
 $submitBody = @{
-  name = 'Example Events - HtmlLite'
+  name = 'Example Arts Center Calendar'
   description = 'Community-submitted HtmlLite source'
   type = 'HtmlLite'
   feedUrl = 'https://www.example.org/events'

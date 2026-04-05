@@ -89,7 +89,7 @@
       }
     },
     {
-      "name": "Example RSS Events",
+      "name": "Example Recreation Events",
       "description": "Community events from Example Org",
       "type": "Rss",
       "feedUrl": "https://example.org/events/feed.rss",

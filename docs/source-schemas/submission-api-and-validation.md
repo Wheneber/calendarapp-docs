@@ -35,7 +35,7 @@ Both `test-fetch` and `community-submissions` accept the same payload structure.
 
 ```json
 {
-  "name": "Example Source",
+  "name": "Example Community Center Events",
   "description": "What this source publishes",
   "type": "JsonApi",
   "feedUrl": "https://example.org/events",
@@ -60,6 +60,7 @@ Both `test-fetch` and `community-submissions` accept the same payload structure.
 - `schemaDefinition` can be up to 200000 characters
 - `url` and `eventMapping` are not valid top-level submission fields
 - `name` and `description` are required for submission; `metadata` is recommended
+- **`name` must identify the organization and event collection in plain language** — use `[Organization] Events` or `[Organization] [Collection]` (for example, "Battle Ground Parks & Recreation Events" or "Portland Art Museum Calendar"); do not include source type identifiers such as "ICS," "RSS," "HtmlLite," "JsonApi," or the word "Feed" — those are platform internals invisible to users
 
 Current v3 guardrails to account for during authoring:
 
@@ -269,7 +270,7 @@ Use `POST /api/source-schemas/test-fetch` while refining the schema. Send the co
 
 ```json
 {
-  "name": "Example RSS Feed",
+  "name": "Example Recreation Events",
   "description": "Community events from Example Org",
   "type": "Rss",
   "feedUrl": "https://example.org/events/feed.rss",

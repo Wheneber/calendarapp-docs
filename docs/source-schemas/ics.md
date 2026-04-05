@@ -198,7 +198,7 @@ Summary of rules:
 
 ```json
 {
-  "name": "Example Events ICS",
+  "name": "Example Community Center Events",
   "description": "Public iCalendar feed for Example Events",
   "type": "Ics",
   "feedUrl": "https://example.org/events.ics",
