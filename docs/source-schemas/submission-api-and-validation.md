@@ -45,7 +45,12 @@ Both `test-fetch` and `community-submissions` accept the same payload structure.
     "category": "community",
     "region": "WA",
     "language": "en",
-    "estimatedEventCount": 20
+    "estimatedEventCount": 20,
+    "eventStartNotBeforeDate": "2026-01-01",
+    "eventFallbackUrl": "https://example.org/events",
+    "customAttributes": {
+      "defaultLocation": "123 Main St, Example City, WA 99999"
+    }
   },
   "calendarStrategyOverride": "Auto"
 }
@@ -82,8 +87,17 @@ JsonApi event-link clarification:
 | `language` | string | `"en"`, `"es"`, `"fr"` (ISO 639-1 codes) |
 | `contactEmail` | string | `"admin@example.org"` for questions about this source |
 | `estimatedEventCount` | integer | `50` (approximately how many events per month) |
+| `eventStartNotBeforeDate` | string (`YYYY-MM-DD`) | `"2026-01-01"` to ignore older events |
+| `eventFallbackUrl` | string (absolute URL) | `"https://example.org/events"` used only when an event has no URL |
+| `customAttributes.defaultLocation` | string | default event `location` fallback |
+| `customAttributes.defaultVenueAddress` | string | default event `venueAddress` fallback |
 
-⚠️ **Do not add custom metadata fields** — use only the fields listed above. Extra fields are ignored or may cause validation errors.
+Metadata notes:
+
+- `eventStartNotBeforeDate` is a policy filter for both `test-fetch` and runtime ingestion.
+- `eventFallbackUrl` is applied only when an event URL is missing.
+- `customAttributes.defaultLocation` and `customAttributes.defaultVenueAddress` are independent and do not cross-fill.
+- Avoid ad-hoc metadata keys outside the fields listed above.
 
 `schemaDefinition` must contain only fields supported by the selected source type. Do not include wrapper or note fields such as:
 
@@ -149,6 +163,11 @@ Treat `sampleEvents` as diagnostic examples, not as a guaranteed sorted list of 
 - Local `test-fetch` is sample-oriented. In local development, parser output and detail enrichment may be capped for speed and safety, so `validation.totalEventsParsed` can be lower than the source's real event count.
 - For HtmlLite and Wix sources that use detail enrichment, judge success by sample quality and plausible field coverage first; do not require exact count parity with the live page during local iteration.
 
+Policy parity reminder:
+
+- Treat `test-fetch` as a policy preview for ingestion.
+- If you use metadata policies such as `eventStartNotBeforeDate`, `eventFallbackUrl`, or fallback custom attributes, validate expected behavior in `sampleEvents` before submission.
+
 Practical ICS check:
 
 1. Fetch the raw `.ics` response.
@@ -201,18 +220,36 @@ Practical ICS check:
     "location": "Ridgefield, WA",
     "region": "WA",
     "category": "government",
-    "language": "en"
+    "language": "en",
+    "eventStartNotBeforeDate": "2026-01-01",
+    "eventFallbackUrl": "https://ridgefieldwa.us/events",
+    "customAttributes": {
+      "defaultLocation": "510 Pioneer St, Ridgefield, WA 98642"
+    }
   }
 }
 ```
 
-**Why:** The API only recognizes specific metadata fields: `location`, `region`, `category`, `language`, `contactEmail`, and `estimatedEventCount`. Custom fields are ignored or rejected. Use `location` to combine city/state info; it will be geocoded automatically.
+**Why:** The API only recognizes specific metadata fields: `location`, `region`, `category`, `language`, `contactEmail`, `estimatedEventCount`, `eventStartNotBeforeDate`, `eventFallbackUrl`, and `customAttributes`. Unknown keys are ignored or rejected. Use `location` to combine city/state info; it will be geocoded automatically.
+
+Allowed `customAttributes` keys for fallback behavior:
+
+- `defaultLocation`
+- `defaultVenueAddress`
+
+These two keys are independent and intentionally do not cross-fill each other.
 
 ---
 
 ### ❌ Mistake 3: Submitting before testing
 
 Always test first with `/api/source-schemas/test-fetch`. If test returns `eventCount: 0`, debug before submitting. A submission with zero events will be rejected or marked for admin review.
+
+When using metadata fallback/date policies, verify all of the following in test-fetch first:
+
+- old events are filtered as expected by `eventStartNotBeforeDate`
+- missing event URLs are populated by `eventFallbackUrl`
+- location fallback behavior matches your intended `defaultLocation` and `defaultVenueAddress`
 
 ### ❌ Mistake 4: Using unsupported event input field
 
@@ -311,6 +348,10 @@ Important note for local development:
 - local `test-fetch` may cap parsed events and detail-page requests
 - this means `validation.totalEventsParsed` can reflect a representative sample rather than the full live event count
 - when counts look artificially low but samples are correct, compare against the raw page/feed before rewriting working selectors
+
+Additional local troubleshooting:
+
+- if `dotnet build` or `dotnet test` fails with DLL copy-lock errors, stop any running API process and rerun the command
 
 ### 3. Submit The Draft
 

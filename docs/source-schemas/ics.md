@@ -18,7 +18,13 @@ The `Ics` source schema submission to CalendarApp **has exactly this structure a
   "metadata": {
     "location": "<location>",
     "category": "<category>",
-    "region": "<region>"
+    "region": "<region>",
+    "eventStartNotBeforeDate": "<yyyy-mm-dd>",
+    "eventFallbackUrl": "<public-events-page-url>",
+    "customAttributes": {
+      "defaultLocation": "<street-city-state-zip>",
+      "defaultVenueAddress": "<street-city-state-zip>"
+    }
   }
 }
 ```
@@ -82,7 +88,11 @@ The parser reads standard RFC 5545 VEVENT fields automatically. No `mappings` co
 {
   "type": "Ics",
   "feedUrl": "https://example.org/events.ics",
-  "schemaDefinition": "{}"
+  "schemaDefinition": "{}",
+  "metadata": {
+    "eventStartNotBeforeDate": "2026-01-01",
+    "eventFallbackUrl": "https://example.org/events"
+  }
 }
 ```
 
@@ -206,10 +216,23 @@ Summary of rules:
   "metadata": {
     "location": "Example City",
     "category": "community",
-    "region": "WA"
+    "region": "WA",
+    "eventStartNotBeforeDate": "2026-01-01",
+    "eventFallbackUrl": "https://example.org/events",
+    "customAttributes": {
+      "defaultLocation": "123 Main St, Example City, WA 99999"
+    }
   }
 }
 ```
+
+## Metadata Policy Notes For ICS
+
+- `eventStartNotBeforeDate` filters out older events in both test-fetch and ingestion.
+- `eventFallbackUrl` is used only when an event is missing a usable URL.
+- `customAttributes.defaultLocation` fills only `location`.
+- `customAttributes.defaultVenueAddress` fills only `venueAddress`.
+- `defaultLocation` and `defaultVenueAddress` are independent and do not cross-fill.
 
 ## Requirements And Validation Notes
 
