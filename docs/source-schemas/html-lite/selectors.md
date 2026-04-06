@@ -95,7 +95,28 @@ If you need any of those, switch that selector to `xpath=` instead of trying to 
 
 ## Wix-Specific Selector Patterns
 
-Wix CMS sites (built with Wix Editor) use repeatable component ID patterns:
+Wix pages do not all expose the same stable selector strategy.
+
+Prefer this order:
+1. semantic `data-hook` selectors on Wix Events pages
+2. machine-readable attributes when available
+3. repeatable `comp-*` component prefixes on Wix CMS repeater pages
+
+Wix Events pages often expose server-rendered hooks such as `events-card`, `title`, `date`, and `location`:
+
+```json
+{
+  "eventCardSelector": "[data-hook='events-card']",
+  "mappings": {
+    "title": "a[data-hook='title']",
+    "startTime": "[data-hook='date']",
+    "location": "[data-hook='location']",
+    "url": "a[data-hook='title']@href"
+  }
+}
+```
+
+When those hooks are missing, Wix CMS sites (built with Wix Editor) often use repeatable component ID patterns:
 
 **Repeater Items:**
 ```xpath
@@ -112,7 +133,7 @@ Wix CMS sites (built with Wix Editor) use repeatable component ID patterns:
 **Why prefixes work:**
 Wix repeater components use stable ID prefixes (e.g., `comp-mcsmgbbs__`) that don't change between page reloads. The suffix (UUID) is unique per repeater item. Using `starts-with()` on the prefix reliably matches all event cards.
 
-**Example Wix Schema:**
+**Fallback Wix CMS Schema:**
 ```json
 {
   "eventCardSelector": ".wixui-repeater__item",
@@ -124,6 +145,8 @@ Wix repeater components use stable ID prefixes (e.g., `comp-mcsmgbbs__`) that do
   }
 }
 ```
+
+For a fuller Wix decision tree and fallback guidance, see [wix-specific-patterns.md](wix-specific-patterns.md).
 
 Unsupported mapping syntax:
 

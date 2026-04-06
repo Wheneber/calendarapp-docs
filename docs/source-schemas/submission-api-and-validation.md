@@ -146,6 +146,8 @@ Treat `sampleEvents` as diagnostic examples, not as a guaranteed sorted list of 
 - `sampleEvents` may include older events even when the source feed still contains current or future events.
 - If an ICS feed looks unexpectedly stale based on `sampleEvents`, inspect the raw feed before concluding the source is unusable.
 - Compare `totalEventsParsed` with the raw feed when counts look suspiciously low, especially for recurring calendars or long-running Google Calendars.
+- Local `test-fetch` is sample-oriented. In local development, parser output and detail enrichment may be capped for speed and safety, so `validation.totalEventsParsed` can be lower than the source's real event count.
+- For HtmlLite and Wix sources that use detail enrichment, judge success by sample quality and plausible field coverage first; do not require exact count parity with the live page during local iteration.
 
 Practical ICS check:
 
@@ -303,6 +305,12 @@ Use `POST /api/source-schemas/test-fetch` while refining the schema. Send the co
 ```
 
 Test-fetch validates the schema parsing and returns event samples. If test succeeds with good event count, proceed to submission with the same payload.
+
+Important note for local development:
+
+- local `test-fetch` may cap parsed events and detail-page requests
+- this means `validation.totalEventsParsed` can reflect a representative sample rather than the full live event count
+- when counts look artificially low but samples are correct, compare against the raw page/feed before rewriting working selectors
 
 ### 3. Submit The Draft
 

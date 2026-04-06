@@ -93,3 +93,40 @@ Pattern B:
   }
 }
 ```
+
+## Wix Events example
+
+Wix Events detail pages often expose stable semantic hooks and Open Graph metadata. Prefer those fields over generic visible text when they are present.
+
+Example event-stage Html enrichment for a Wix Events page:
+
+```json
+"event": {
+  "type": "Html",
+  "input": {
+    "mode": "calendarFieldUrl",
+    "field": "eventUrl",
+    "baseUrl": "https://example.wixsite.com"
+  },
+  "parser": {
+    "mappings": {
+      "startTime": "[data-hook='event-full-date']",
+      "location": "[data-hook='event-full-location']",
+      "venueAddress": "[data-hook='event-full-location']",
+      "imageUrl": "meta[property='og:image']@content",
+      "description": "meta[property='og:description']@content"
+    }
+  },
+  "limits": {
+    "sameHostOnly": true,
+    "maxRequestsPerRun": 5
+  }
+}
+```
+
+Practical preference order for Wix detail pages:
+
+1. `event-full-date` / `event-full-location`
+2. other event-specific semantic hooks
+3. Open Graph metadata for image and description fallbacks
+4. generic layout text only when the semantic fields are missing

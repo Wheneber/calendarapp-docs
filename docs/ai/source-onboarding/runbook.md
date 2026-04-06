@@ -74,6 +74,12 @@ Decision loop:
 2. If not, inspect the page or network calls for a JSON endpoint that returns event objects.
 3. Use HtmlLite only when the events are present in static HTML and no better structured feed exists.
 
+Wix-specific shortcut:
+
+- if the initial HTML contains repeated Wix event cards with semantic `data-hook` selectors such as `events-card`, `title`, `date`, and `location`, prefer `HtmlLite` and start with those hooks
+- if the page only exposes repeatable `comp-*` prefixes, still use `HtmlLite` but prefer XPath `starts-with()` patterns
+- if the initial HTML is only a shell and the real event data lives in reusable JSON/bootstrap payloads, keep investigating and prefer `JsonApi`
+
 Evidence requirements before locking source type:
 
 1. Endpoint or page response can be fetched reliably at run time.
@@ -218,6 +224,12 @@ Pagination contract:
 1. Run `POST /api/source-schemas/test-fetch`.
 2. If test-fetch succeeds, submit Draft via `POST /api/source-schemas/community-submissions`.
 3. Read `response.validation`.
+
+Local test-fetch caution:
+
+- local validation can be sample-capped for parsed events and detail fetches
+- do not assume `validation.totalEventsParsed` equals the full live event count during local iteration
+- for HtmlLite and Wix sources, prefer accurate sample fields and plausible coverage over exact count parity until a fuller verification path is available
 4. If failed, adjust and resubmit.
 
 For every iteration, record:

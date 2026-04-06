@@ -6,6 +6,14 @@ Use this page when the source is built on Wix and the event list is present in t
 
 This page is most useful when Wix component IDs are the only stable handles for repeated cards and child fields.
 
+## Wix Decision Tree
+
+Use this quick routing check before you write selectors:
+
+- Wix Events page with stable server-rendered `data-hook` attributes such as `events-card`, `title`, `date`, and `location`: use `HtmlLite` and prefer those `data-hook` selectors first.
+- Wix CMS repeater page where the only stable repeated handles are generated `comp-*` prefixes: use `HtmlLite` and match the repeated prefixes with XPath `starts-with()`.
+- Wix shell page where the initial HTML does not contain repeated event cards and the real event data only appears in a JSON/bootstrap payload: keep investigating and prefer `JsonApi` if the JSON source is real and reusable.
+
 ## Platform Signatures
 
 Common Wix indicators:
@@ -19,6 +27,42 @@ Common Wix indicators:
 - Use `HtmlLite` when repeated event cards are already present in the initial response.
 - Prefer `JsonApi` if the page shell loads event data from a real structured JSON endpoint.
 - Do not force CSS selectors when the stable structure is only expressible with XPath `starts-with()`.
+
+## Prefer `data-hook` Before `comp-*`
+
+Many Wix Events pages expose semantic `data-hook` attributes in server-rendered HTML. When those hooks exist, they are usually a better first choice than generated component IDs.
+
+Prefer this order:
+1. stable `data-hook` selectors tied to event semantics
+2. machine-readable attributes or explicit event metadata
+3. `comp-*` prefix selectors when semantic hooks are missing
+
+Typical Wix Events hooks:
+- `events-card`
+- `title`
+- `date`
+- `location`
+- `event-full-date`
+- `event-full-location`
+
+Example Wix Events list-page schema:
+
+```json
+{
+  "eventCardSelector": "[data-hook='events-card']",
+  "mappings": {
+    "title": "a[data-hook='title']",
+    "startTime": "[data-hook='date']",
+    "location": "[data-hook='location']",
+    "url": "a[data-hook='title']@href"
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime"]
+  }
+}
+```
+
+Use `comp-*` selectors as a fallback when the page behaves more like a Wix CMS repeater and does not expose stable semantic hooks.
 
 ## Common Extraction Patterns
 
@@ -89,6 +133,7 @@ Common pitfalls:
 - If text extraction returns null or multiple fragments, target the inner `span` or the first text node explicitly.
 - If list-page times are ranges such as `May 8 - 24, 2026`, use the guidance in [time-handling.md](time-handling.md#date-range-parsing--silent-failures).
 - If the list is teaser-only, enable detail-page enrichment instead of overfitting card selectors.
+- If a Wix Events detail page is available, prefer `event-full-date` and `event-full-location` over generic visible text blocks.
 
 ## Minimal Working Example
 
@@ -110,7 +155,8 @@ Common pitfalls:
 
 When an AI agent is onboarding a Wix source:
 1. Confirm the event cards exist in the first HTML response.
-2. Identify stable component ID prefixes from repeated cards, not one-off wrapper IDs.
-3. Build the minimal schema with `title`, `url`, and parseable `startTime`.
-4. Validate against multiple sample cards before adding detail-page enrichment.
-5. Escalate to `JsonApi` only if the real event data lives outside the initial HTML.
+2. Check for stable `data-hook` selectors before inspecting `comp-*` prefixes.
+3. If `data-hook` selectors are absent, identify stable component ID prefixes from repeated cards, not one-off wrapper IDs.
+4. Build the minimal schema with `title`, `url`, and parseable `startTime`.
+5. Validate against multiple sample cards before adding detail-page enrichment.
+6. Escalate to `JsonApi` only if the real event data lives outside the initial HTML.
