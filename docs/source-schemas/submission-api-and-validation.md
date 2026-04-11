@@ -103,7 +103,7 @@ Metadata notes:
 
 - `sourceName`
 - `baseUrl`
-- `transforms`
+- top-level `transforms`
 
 Those do not belong in the submitted schema body.
 
@@ -151,7 +151,9 @@ This is a common cross-contract mistake when using examples from other systems.
 }
 ```
 
-For `Ics`, `schemaDefinition` is typically `{}` or validation-only because the parser reads RFC 5545 fields directly.
+For `Ics`, `schemaDefinition` is commonly `{}` for baseline parsing, but may include `validation`, `eventEnrichment`, and optional `fieldTransforms` for deterministic cleanup.
+
+For `Ics`, `fieldTransforms` runs after RFC 5545 extraction and before validation checks. It is per-field cleanup only and does not enable cross-field mapping.
 
 ## Reading `test-fetch` Results Carefully
 

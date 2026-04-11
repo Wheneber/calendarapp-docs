@@ -50,7 +50,7 @@ Use this track when an agent can browse pages and execute API calls end-to-end, 
 Contract reminder for ICS onboarding:
 - use top-level `type`, `feedUrl`, and `schemaDefinition`
 - do not use top-level `url` or `eventMapping` for this API
-- keep `Ics` `schemaDefinition` minimal (`{}` or validation-only) unless stricter validation is needed
+- keep `Ics` `schemaDefinition` minimal by default (`{}` or validation-only), and add `fieldTransforms` only when deterministic cleanup is needed
 
 1. Discover a starting URL and identify the most stable source type.
 2. Build the smallest valid `schemaDefinition` for that type.
@@ -77,7 +77,7 @@ Contract reminder for ICS onboarding:
 | Shared | [Source Schema JSON Schema Files](source-schemas/json-schema-files.md) | Machine-readable schemaDefinition contracts for all supported source types |
 | Shared | [Validation Checklist](source-schemas/html-lite/validation-checklist.md) | Field-completeness and handoff readiness gates |
 | Shared | [Troubleshooting](source-schemas/html-lite/troubleshooting.md) | Recovery order for zero-parse and validation failures |
-| Ics | [Guide](source-schemas/ics.md) | When to use ICS, minimal schemaDefinition, and validation notes |
+| Ics | [Guide](source-schemas/ics.md) | When to use ICS, minimal schemaDefinition, optional fieldTransforms, and validation notes |
 | Rss | [Guide](source-schemas/rss.md) | RSS extraction rules and contributor workflow |
 | JsonApi | [Guide](source-schemas/json-api.md) | JSON path mappings, pagination, auth, and advanced validation rules |
 | HtmlLite | [Overview](source-schemas/html-lite/overview.md) | Contract summary and deterministic build order |

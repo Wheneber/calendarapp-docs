@@ -79,6 +79,46 @@ Use `Ics -> None` when the ICS feed provides complete event data and no HTML det
 }
 ```
 
+### Ics -> None (with fieldTransforms)
+
+Use this variant when ICS fields are mostly correct but require deterministic cleanup (for example, Teams links prefixed in `LOCATION`).
+
+```json
+{
+  "schemaVersion": 3,
+  "pipeline": {
+    "calendar": {
+      "type": "Ics",
+      "parser": {
+        "fieldTransforms": {
+          "location": [
+            {
+              "type": "regexReplace",
+              "value": "^\\s*https://teams\\.microsoft\\.com[^,]*(?:,\\s*)?(.*)$",
+              "replacement": "$1"
+            },
+            { "type": "trim" },
+            { "type": "collapseWhitespace" }
+          ]
+        }
+      }
+    },
+    "event": {
+      "type": "None",
+      "input": {
+        "mode": "none"
+      },
+      "parser": {}
+    }
+  },
+  "validation": {
+    "requiredFields": ["title", "startTime"]
+  }
+}
+```
+
+> `fieldTransforms` is optional and should be used for cleanup only, not for reconstructing missing required fields.
+
 ## Ics -> Html
 
 ```json

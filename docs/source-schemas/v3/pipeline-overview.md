@@ -76,6 +76,36 @@ For Html calendar parsers, calendar parser options can also include `multiDateEx
 This allows one calendar card to emit multiple occurrence events from a date-list field.
 When combined with `detailPage.occurrenceSelector`, expansion determines event count and detail occurrence matching only refines emitted events.
 
+For Ics calendar parsers, calendar parser options can include `fieldTransforms` for deterministic per-field cleanup after RFC 5545 parsing and before event-stage processing.
+This does not enable `mappings` for Ics.
+
+Example Ics parser cleanup:
+
+```json
+{
+  "pipeline": {
+    "calendar": {
+      "type": "Ics",
+      "parser": {
+        "fieldTransforms": {
+          "location": [
+            {
+              "type": "regexReplace",
+              "value": "^\\s*https://teams\\.microsoft\\.com[^,]*(?:,\\s*)?(.*)$",
+              "replacement": "$1"
+            },
+            { "type": "trim" },
+            { "type": "collapseWhitespace" }
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+If no cleanup is needed, keep `parser` as `{}`.
+
 Event stage input modes:
 - `none`
 - `calendarFieldUrl`

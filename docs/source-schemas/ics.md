@@ -29,7 +29,7 @@ The `Ics` source schema submission to CalendarApp **has exactly this structure a
 }
 ```
 
-The `schemaDefinition` is a compact JSON string containing `validation` and optional `eventEnrichment`:
+The `schemaDefinition` is a compact JSON string containing optional `validation`, optional `eventEnrichment`, and optional `fieldTransforms`:
 
 ```json
 {
@@ -43,6 +43,17 @@ The `schemaDefinition` is a compact JSON string containing `validation` and opti
     "parser": "GenericHtml",
     "maxFetchesPerRun": 5,
     "sameHostOnly": true
+  },
+  "fieldTransforms": {
+    "location": [
+      {
+        "type": "regexReplace",
+        "value": "^\\s*https://teams\\.microsoft\\.com[^,]*(?:,\\s*)?(.*)$",
+        "replacement": "$1"
+      },
+      { "type": "trim" },
+      { "type": "collapseWhitespace" }
+    ]
   }
 }
 ```
@@ -53,7 +64,9 @@ or for test-fetch, simply:
 {}
 ```
 
-**Forbidden at all levels:** `url`, `mappings`, `eventMapping`, `transforms`, `recurrence`, `sourceType`, `eventDefaults`, `allDay`.
+**Forbidden in Ics request/schema contracts:** top-level `url`, `mappings`, `eventMapping`, top-level `transforms`, `recurrence`, `sourceType`, `eventDefaults`, `allDay`.
+
+`fieldTransforms` is supported inside `schemaDefinition` for deterministic per-field cleanup after RFC 5545 parsing.
 
 ## When To Use It
 
@@ -81,6 +94,38 @@ The parser reads standard RFC 5545 VEVENT fields automatically. No `mappings` co
 | `TZID` (on DTSTART) | `timeZone` | Carried through from the timezone identifier on the start field. |
 
 > **Note on `URL` vs `DESCRIPTION`:** Some sources use the `URL` VEVENT field for a shared category link rather than a per-event deep link. The parser resolves relative URLs against the source feed and ignores them when they normalize to the same target as the feed itself, even if query parameter order differs. In that case, if the `DESCRIPTION` field contains a bare absolute URL, the parser uses it as `eventUrl` automatically. You do not need to configure this — it is built-in fallback behavior.
+
+## Optional Field Transforms (Ics)
+
+Use `fieldTransforms` for deterministic cleanup of already-parsed ICS fields. This does not replace RFC 5545 parsing and does not introduce mappings.
+
+Supported keys are parsed event fields such as:
+
+- `title`
+- `description`
+- `location`
+- `venueName`
+- `venueAddress`
+- `url`
+- `imageUrl`
+
+Example: strip Teams URL from `location` while preserving venue text.
+
+```json
+{
+  "fieldTransforms": {
+    "location": [
+      {
+        "type": "regexReplace",
+        "value": "^\\s*https://teams\\.microsoft\\.com[^,]*(?:,\\s*)?(.*)$",
+        "replacement": "$1"
+      },
+      { "type": "trim" },
+      { "type": "collapseWhitespace" }
+    ]
+  }
+}
+```
 
 ## Test-Fetch Example
 
@@ -133,7 +178,7 @@ For test-fetch parity with runtime ingestion behavior, send the same `eventEnric
 
 ## Wrong Vs Right Payload Shape
 
-The `Ics` `schemaDefinition` supports `validation` and optional `eventEnrichment`. The parser still reads RFC 5545 fields (`UID`, `SUMMARY`, `DTSTART`, `DTEND`, `DESCRIPTION`, `LOCATION`, `URL`) directly from the feed. Do not add `mappings`, `eventMapping`, or transform blocks.
+The `Ics` `schemaDefinition` supports `validation`, optional `eventEnrichment`, and optional `fieldTransforms`. The parser still reads RFC 5545 fields (`UID`, `SUMMARY`, `DTSTART`, `DTEND`, `DESCRIPTION`, `LOCATION`, `URL`) directly from the feed. Do not add `mappings` or `eventMapping`.
 
 Wrong — top-level `url` instead of `feedUrl`, `eventMapping` inside `schemaDefinition`:
 
@@ -171,7 +216,7 @@ Also wrong — `mappings` is equally unsupported in `schemaDefinition`:
 }
 ```
 
-Right for this API contract (validation-only `schemaDefinition`):
+Right for this API contract (minimal `schemaDefinition`):
 
 ```json
 {
@@ -181,13 +226,13 @@ Right for this API contract (validation-only `schemaDefinition`):
 }
 ```
 
-Also valid when you want explicit validation guards:
+Also valid when you want explicit validation guards and deterministic field cleanup:
 
 ```json
 {
   "type": "Ics",
   "feedUrl": "https://calendar.google.com/calendar/ical/lacentercalendar%40gmail.com/public/basic.ics",
-  "schemaDefinition": "{\"validation\":{\"requiredFields\":[\"title\",\"startTime\"],\"minEventsPerFetch\":1}}"
+  "schemaDefinition": "{\"validation\":{\"requiredFields\":[\"title\",\"startTime\"],\"minEventsPerFetch\":1},\"fieldTransforms\":{\"location\":[{\"type\":\"regexReplace\",\"value\":\"^\\\\s*https://teams\\\\.microsoft\\\\.com[^,]*(?:,\\\\s*)?(.*)$\",\"replacement\":\"$1\"},{\"type\":\"trim\"},{\"type\":\"collapseWhitespace\"}]}}"
 }
 ```
 
@@ -200,6 +245,7 @@ Summary of rules:
 | `schemaDefinition` | top-level request field | compact JSON string |
 | `validation` | inside `schemaDefinition` | optional validation constraints |
 | `eventEnrichment` | inside `schemaDefinition` | optional detail-page enrichment settings |
+| `fieldTransforms` | inside `schemaDefinition` | optional per-field cleanup after parse |
 | `mappings` | **nowhere** | unsupported for `Ics` |
 | `eventMapping` | **nowhere** | unsupported for `Ics` |
 | `url` | **nowhere** | use `feedUrl` at top level |
