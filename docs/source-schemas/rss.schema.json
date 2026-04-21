@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://martinisaksen.github.io/calendarapp-docs/source-schemas/rss.schema.json",
+  "$id": "https://Wheneber.github.io/calendarapp-docs/source-schemas/rss.schema.json",
   "title": "CalendarApp Rss schemaDefinition",
   "description": "Contributor-facing JSON Schema for pipeline.calendar.parser when pipeline.calendar.type is Rss.",
   "type": "object",

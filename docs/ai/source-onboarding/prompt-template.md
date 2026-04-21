@@ -21,7 +21,7 @@ REQUIRED PROCESS — NO SHORTCUTS
 Step 1 — Retrieve Documentation
 
 You MUST fetch and read all of these before doing anything else:
-- https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/llms.txt
+- https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/llms.txt
 - From that index, fetch the raw URL for: choose-source-type.md
 - From that index, fetch the raw URL for: submission-api-and-validation.md
 
@@ -40,13 +40,13 @@ Print a section called "Doc Evidence" containing direct verbatim quotes (not sum
 Step 3 — Retrieve Schema Contract
 
 Fetch and read:
-https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/submission-request.schema.json
+https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/submission-request.schema.json
 
 Then fetch the type-specific contract for the selected source type:
-- Ics: https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/ics.schema.json
-- Rss: https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/rss.schema.json
-- JsonApi: https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/v3/source-schema-v3.schema.json
-- HtmlLite: https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/html-lite.schema.json
+- Ics: https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/ics.schema.json
+- Rss: https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/rss.schema.json
+- JsonApi: https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/v3/source-schema-v3.schema.json
+- HtmlLite: https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/html-lite.schema.json
 
 List all constraints that apply to: schemaDefinition, metadata, and required fields. Validate both the outer submission payload and the inner type-specific schemaDefinition contract.
 

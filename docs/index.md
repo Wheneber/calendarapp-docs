@@ -12,13 +12,13 @@ It is intentionally split into two execution tracks:
 
 AI tools and scrapers: the rendered site requires no JavaScript (MkDocs generates static HTML), but the most reliable way to load these docs programmatically is via raw GitHub markdown.
 
-- **Full page index:** [`/llms.txt`](https://martinisaksen.github.io/calendarapp-docs/llms.txt) — lists every page and schema file with a direct raw GitHub link
-- **Raw markdown base URL:** `https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/`
+- **Full page index:** [`/llms.txt`](https://Wheneber.github.io/calendarapp-docs/llms.txt) — lists every page and schema file with a direct raw GitHub link
+- **Raw markdown base URL:** `https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/`
 - **JSON Schema files** (machine-readable `schemaDefinition` contracts): see [Source Schema JSON Schema Files](source-schemas/json-schema-files.md)
 
 Example — fetch the ICS guide as plain text:
 ```
-https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/ics.md
+https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/ics.md
 ```
 
 ## Choose A Track

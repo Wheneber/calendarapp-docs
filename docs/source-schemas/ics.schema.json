@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://martinisaksen.github.io/calendarapp-docs/source-schemas/ics.schema.json",
+  "$id": "https://Wheneber.github.io/calendarapp-docs/source-schemas/ics.schema.json",
   "title": "CalendarApp Ics schemaDefinition",
   "description": "Contributor-facing JSON Schema for CalendarApp Ics source schemas.",
   "type": "object",

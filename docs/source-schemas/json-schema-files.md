@@ -8,11 +8,11 @@ Use these files to help humans and AI generate more accurate schemas before call
 
 | Type | Rendered link | Raw GitHub link (for AI / direct fetch) |
 |---|---|---|
-| `Ics` | [ics.schema.json](ics.schema.json) | [raw](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/ics.schema.json) |
-| `Rss` | [rss.schema.json](rss.schema.json) | [raw](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/rss.schema.json) |
-| `JsonApi (legacy v2)` | [json-api-v2.schema.json](json-api-v2.schema.json) | [raw](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/json-api-v2.schema.json) |
-| `HtmlLite` | [html-lite.schema.json](html-lite.schema.json) | [raw](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/html-lite.schema.json) |
-| `PipelineV3` | [v3/source-schema-v3.schema.json](v3/source-schema-v3.schema.json) | [raw](https://raw.githubusercontent.com/martinisaksen/calendarapp-docs/main/docs/source-schemas/v3/source-schema-v3.schema.json) |
+| `Ics` | [ics.schema.json](ics.schema.json) | [raw](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/ics.schema.json) |
+| `Rss` | [rss.schema.json](rss.schema.json) | [raw](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/rss.schema.json) |
+| `JsonApi (legacy v2)` | [json-api-v2.schema.json](json-api-v2.schema.json) | [raw](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/json-api-v2.schema.json) |
+| `HtmlLite` | [html-lite.schema.json](html-lite.schema.json) | [raw](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/html-lite.schema.json) |
+| `PipelineV3` | [v3/source-schema-v3.schema.json](v3/source-schema-v3.schema.json) | [raw](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/v3/source-schema-v3.schema.json) |
 
 Use the **raw** links when programmatically loading schemas into an AI tool or validation pipeline — they return plain JSON without HTML or JavaScript.
 
