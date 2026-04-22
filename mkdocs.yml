@@ -1,8 +1,8 @@
 site_name: Wheneber Docs
 site_description: Public documentation for Wheneber source contribution workflows for humans and AI agents.
-site_url: https://Wheneber.github.io/calendarapp-docs/
-repo_url: https://github.com/calendarapp/calendarapp-docs
-repo_name: calendarapp/calendarapp-docs
+site_url: https://Wheneber.github.io/wheneber-docs/
+repo_url: https://github.com/Wheneber/wheneber-docs
+repo_name: Wheneber/wheneber-docs
 
 theme:
   name: material

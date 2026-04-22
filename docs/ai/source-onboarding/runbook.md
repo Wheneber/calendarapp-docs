@@ -18,17 +18,17 @@ Use this runbook when an AI agent can execute the full source onboarding loop fr
 ## Required Reading
 
 Before execution, read:
-- [llms.txt](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/llms.txt) to discover canonical docs and schema files
-- [Choose A Source Type](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/choose-source-type.md)
-- [Submission API And Validation](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/submission-api-and-validation.md)
-- [Submission Request JSON Schema](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/submission-request.schema.json)
+- [llms.txt](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/llms.txt) to discover canonical docs and schema files
+- [Choose A Source Type](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/source-schemas/choose-source-type.md)
+- [Submission API And Validation](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/source-schemas/submission-api-and-validation.md)
+- [Submission Request JSON Schema](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/source-schemas/submission-request.schema.json)
 - the type-specific page that matches the chosen source type (use raw GitHub URL from llms.txt)
 
 Type-specific schemaDefinition JSON Schemas:
-- [ICS schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/ics.schema.json)
-- [RSS schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/rss.schema.json)
-- [JsonApi V2 schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/json-api-v2.schema.json)
-- [HtmlLite schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/calendarapp-docs/main/docs/source-schemas/html-lite.schema.json)
+- [ICS schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/source-schemas/ics.schema.json)
+- [RSS schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/source-schemas/rss.schema.json)
+- [JsonApi V2 schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/source-schemas/json-api-v2.schema.json)
+- [HtmlLite schemaDefinition JSON Schema](https://raw.githubusercontent.com/Wheneber/wheneber-docs/main/docs/source-schemas/html-lite.schema.json)
 
 ## Input Contract
 

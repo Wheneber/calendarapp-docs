@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://Wheneber.github.io/calendarapp-docs/source-schemas/html-lite.schema.json",
+  "$id": "https://Wheneber.github.io/wheneber-docs/source-schemas/html-lite.schema.json",
   "title": "Wheneber HtmlLite schemaDefinition",
   "description": "Contributor-facing JSON Schema for Wheneber HtmlLite source schemas.",
   "type": "object",

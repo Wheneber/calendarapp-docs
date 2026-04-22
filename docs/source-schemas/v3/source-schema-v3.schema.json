@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://Wheneber.github.io/calendarapp-docs/source-schemas/v3/source-schema-v3.schema.json",
+  "$id": "https://Wheneber.github.io/wheneber-docs/source-schemas/v3/source-schema-v3.schema.json",
   "title": "Wheneber source schemaDefinition v3 pipeline",
   "description": "Two-stage source schemaDefinition contract with calendar and event parser sections.",
   "type": "object",

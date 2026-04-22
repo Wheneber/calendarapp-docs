@@ -309,7 +309,7 @@ Before you start, know which environment you're working in:
 |-------------|---------------|
 | **Local development** (you run backend locally) | `http://localhost:5047/api/source-schemas` |
 | **GitHub Codespaces / Docker** | Check your backend's exposed port (usually `5047` or `5000`) |
-| **Production / Hosted** | `https://calendarapp-api.onrender.com/api/source-schemas` (for testing only; production submissions use a different endpoint) |
+| **Production / Hosted** | `https://wheneber-api.onrender.com/api/source-schemas` (for testing only; production submissions use a different endpoint) |
 
 ⚠️ **Only use `localhost:5047` for development, testing, and iteration. Production contributors submit via the website form or documented production endpoint.**
 
